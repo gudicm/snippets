@@ -1,0 +1,185 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>dapperSp</Title>
+      <Shortcut>dapperSp</Shortcut>
+      <Description>dapper generator for calling peoc</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations>
+        <Literal>
+          <ID>spKnjizenjePoRacunu_Select</ID>
+          <ToolTip />
+          <Default />
+        </Literal>
+      </Declarations>
+      <Code Language="sql"><![CDATA[BEGIN
+
+DECLARE @SpName VARCHAR(100), @SchemaName VARCHAR(100)
+DECLARE @CCode VARCHAR(8000), @Codepart VARCHAR(4000), @vProcCall VARCHAR(500)
+DECLARE @ParamName VARCHAR(50), @ParamType VARCHAR(50), @ParamDir VARCHAR(100), @ParamVar VARCHAR(100), @ParamSize int 
+DECLARE	@RowCount INT, @RowSet INT
+DECLARE @tParams TABLE (
+RowID int not null primary key identity(1,1),  
+ParamName sysname,
+ParamVar sysname,
+ParamType sysname,
+ParamSize sysname,
+isOut sysname,
+ProcName sysname
+
+)  
+
+
+SELECT @SpName = '$spKnjizenjePoRacunu_Select$';
+SELECT @SchemaName = 'FINIZV'; 
+SELECT @Codepart = '';
+
+
+
+
+SELECT @SpName = (
+SELECT TOP 1 SPECIFIC_NAME FROM INFORMATION_SCHEMA.ROUTINES 
+WHERE 
+ROUTINE_NAME like CONCAT('%',@SpName)
+AND SPECIFIC_SCHEMA = @SchemaName
+)
+
+
+INSERT into @tParams  (
+ParamName ,
+ParamVar,
+ParamType ,
+ParamSize,
+IsOut,
+ProcName 
+) 
+select 
+sys.parameters.name AS paramName,
+CONCAT('p',(RIGHT(sys.parameters.name, LEN(sys.parameters.name)-1 ))) AS paramVar,
+sys.types.name AS paramType,
+sys.parameters.max_length AS ParamSize,
+sys.parameters.is_output AS isOut,
+sys.procedures.name AS procName
+FROM sys.parameters 
+inner join sys.procedures on parameters.object_id = procedures.object_id 
+inner join sys.types on parameters.system_type_id = types.system_type_id AND parameters.user_type_id = types.user_type_id
+WHERE procedures.name = @SpName
+
+SET @RowSet = @@ROWCOUNT
+
+SELECT * FROM @tParams AS tp
+
+
+IF (
+EXISTS(
+	SELECT 1 FROM @tParams
+))
+BEGIN
+
+
+--	-- iterate through params
+--	-- todo call TO procedure
+	
+	
+			SET @RowCount = 1
+			WHILE (@RowCount <= @RowSet)
+			BEGIN
+					
+					
+					
+					SELECT @ParamName = CAST(ParamName AS VARCHAR) , 
+					@ParamType = CAST(ParamType AS VARCHAR),
+					@ParamVar = ParamVar,
+					@ParamSize = ParamSize,
+					@ParamDir = 
+					CASE 
+						WHEN isOut = 0 THEN 'ParameterDirection.Input'
+						ELSE 'ParameterDirection.InputOutput' 
+					END
+					FROM @tParams WHERE RowID = @RowCount
+
+					SELECT @ParamType = (SELECT CASE 
+													WHEN @ParamType = 'bigint' THEN 'Int64'
+													WHEN @ParamType = 'binary' THEN 'Binary'
+													WHEN @ParamType = 'bit' THEN 'Boolean'
+													WHEN @ParamType = 'char' THEN 'Char'
+													WHEN @ParamType = 'datetime' THEN 'DateTime'
+													WHEN @ParamType = 'datetime2' THEN 'DateTime2'
+													WHEN @ParamType = 'decimal' THEN 'Decimal'	
+													WHEN @ParamType = 'float' THEN 'Double'	
+													WHEN @ParamType = 'int' THEN 'Int32'	
+													WHEN @ParamType = 'money' THEN 'Decimal'
+													WHEN @ParamType = 'numeric' THEN 'Decimal'
+													WHEN @ParamType = 'nvarchar' THEN 'NVarChar'
+													WHEN @ParamType = 'numeric' THEN 'Decimal'
+													WHEN @ParamType = 'varchar' THEN 'String'
+													WHEN @ParamType = 'xml' THEN 'Xml'
+													ELSE 'Object'																																	
+													END) 
+
+					--SELECT	@ParamSize = CASE WHEN @ParamType = 'String' THEN @ParamSize
+					      	                        --ELSE 0 END
+
+					IF(@ParamType = 'String')      	             
+						SELECT @Codepart = @Codepart + CHAR(13) + CONCAT('param.Add("', @ParamName,'",',@ParamVar,',  DbType.',@ParamType,', ', @ParamDir ,' ,' , @ParamSize, ');') 
+					ELSE	
+						
+						SELECT @Codepart = @Codepart + CHAR(13) + CONCAT('param.Add("', @ParamName,'", ',@ParamVar,',  DbType.',@ParamType,
+						', ', @ParamDir, ');')
+
+					
+					SET @RowCount = @RowCount +1 	    
+			END;
+
+
+	SELECT @vProcCall = CONCAT('var res = sqlConn.Query<ReturnType>(','"', @SchemaName,'.',@SpName, '", ', 'param, commandType: CommandType.StoredProcedure); ')
+	SELECT @CCode = CONCAT(
+	'using (var sqlConn = new SqlConnection(connStr)){',
+	CHAR(13),
+	'var param = new DynamicParameters();',
+	CHAR(13),
+	'// param definition',
+	CHAR(13),
+	@Codepart,
+	CHAR(13),
+	'// call to procedure',
+	CHAR(13),
+	@vProcCall,
+	CHAR(13),
+	'}')
+
+	PRINT @CCode
+
+END	
+
+
+ELSE
+BEGIN
+	
+	SELECT @vProcCall = CONCAT('var res = sqlConn.Query<ReturnType>(','"', @SchemaName,'.',@SpName, '"', ' commandType: CommandType.StoredProcedure); ')
+	SELECT @CCode = CONCAT(
+	'using (var sqlConn = new SqlConnection(connStr)){',
+	CHAR(13),
+	'// call to procedure',
+	CHAR(13),
+	@vProcCall,
+	CHAR(13),
+	'}')
+
+	PRINT @CCode
+END
+
+ 
+END;
+
+
+]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>ProcFindDetails</Title>
+      <Shortcut>ProcFindDetails</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[SELECT * FROM INFORMATION_SCHEMA.ROUTINES 
+	WHERE 
+    ROUTINE_NAME LIKE '%name_of_proc%'
+    
+	select * from sys.parameters 
+	inner join sys.procedures on parameters.object_id = procedures.object_id 
+	inner join sys.types on parameters.system_type_id = types.system_type_id AND parameters.user_type_id = types.user_type_id
+	where procedures.name = 'sp_name'
+]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

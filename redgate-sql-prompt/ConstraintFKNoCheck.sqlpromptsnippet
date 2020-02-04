@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>ConstraintFKNoCheck</Title>
+      <Shortcut>ConstraintFKNoCheck</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[ALTER TABLE [dbo].[FakturaVeza]  WITH NOCHECK ADD  CONSTRAINT [FK_FakturaVeza_Faktura] FOREIGN KEY([PKFakturaPrva])
+REFERENCES [dbo].[Faktura] ([PKFaktura])]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

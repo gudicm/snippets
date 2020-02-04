@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>TransactionPromis</Title>
+      <Shortcut>TransactionPromis</Shortcut>
+      <Description>Promis transaction block</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[SET NOCOUNT ON;
+    SET XACT_ABORT ON;
+
+    DECLARE @Error INT;
+
+    BEGIN TRY
+
+    BEGIN TRANSACTION;
+	-- insert/update/delete
+
+	COMMIT TRANSACTION;
+    END TRY
+    BEGIN CATCH
+        SET @Error = @@Error;
+        IF @@Trancount > 0
+            ROLLBACK TRANSACTION;
+        EXEC Aplikacija.spErrHandler @Err = @Error, @PROCID = @@PROCID;
+    END CATCH;
+
+    SET XACT_ABORT OFF;
+    SET NOCOUNT OFF;]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

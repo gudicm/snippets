@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>spCommentHeader</Title>
+      <Shortcut>spCommentHeader</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations>
+        <Literal>
+          <ID>Author</ID>
+          <ToolTip />
+          <Default />
+        </Literal>
+        <Literal>
+          <ID>yyyy_mm_dd</ID>
+          <ToolTip />
+          <Default />
+        </Literal>
+        <Literal>
+          <ID>Description</ID>
+          <ToolTip />
+          <Default />
+        </Literal>
+      </Declarations>
+      <Code Language="sql"><![CDATA[-- =============================================
+-- Author:		$Author$
+-- Create date: $yyyy_mm_dd$
+-- Description:	$Description$
+-- History:
+-- Date			Author			Comment	  
+-- =============================================]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

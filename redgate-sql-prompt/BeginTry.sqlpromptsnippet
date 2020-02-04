@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>BeginTry</Title>
+      <Shortcut>BeginTry</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[SET NOCOUNT ON;
+SET XACT_ABORT ON;
+
+BEGIN TRY
+
+
+    BEGIN TRANSACTION;
+	
+	PRINT ''
+
+    COMMIT TRANSACTION;
+
+END TRY
+BEGIN CATCH
+    SET @Error = @@Error;
+    IF @@Trancount > 0
+        ROLLBACK TRANSACTION;
+    EXEC Aplikacija.spErrHandler @Error, @@PROCID;
+END CATCH;
+SET XACT_ABORT OFF;
+SET NOCOUNT OFF;]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

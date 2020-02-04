@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>trustworthy</Title>
+      <Shortcut>trustworthy</Shortcut>
+      <Description>db trustworthy attrib</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[-- check current trustworthy
+SELECT is_trustworthy_on FROM sys.databases WHERE name = 'Promisdeveloper';
+-- change trustworthy attrib
+ALTER DATABASE Promisdeveloper SET TRUSTWORTHY ON;]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

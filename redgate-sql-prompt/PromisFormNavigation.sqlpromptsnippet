@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>PromisFormNavigation</Title>
+      <Shortcut>PromisFormNavigation</Shortcut>
+      <Description>dohvat ptanje forme u navigaciji</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[DECLARE	@FormName VARCHAR(MAX) = 'frmPlanNarudzbiStavkeTablica'
+SET @FormName = '%' + @FormName + '%'
+
+;WITH	Tree ( PkNavigacijaParent, Nivo, BrojForme, Putanja, Form )
+			AS ( SELECT	PkNavigacijaParent
+					,	1 AS Nivo
+					,	ROW_NUMBER() OVER ( ORDER BY PkNavigacijaParent ) AS BrojForme
+					,	CAST(Tekst AS NVARCHAR(MAX)) Putanja
+					,   Form
+					FROM
+						Aplikacija.Navigacija
+					WHERE Form LIKE @FormName
+					UNION ALL
+					SELECT	N.PkNavigacijaParent
+					,		Tree.Nivo + 1
+					,		Tree.BrojForme
+					,		N.Tekst + CAST(' \ ' AS NVARCHAR(MAX))
+							+ Tree.Putanja
+					,		Tree.Form
+					FROM	Aplikacija.Navigacija N
+							INNER JOIN Tree ON N.PkNavigacija = Tree.PkNavigacijaParent
+				)
+
+	SELECT	Putanja, Form
+	FROM	( SELECT	Putanja
+				,		Form
+				,		ROW_NUMBER() OVER ( PARTITION BY BrojForme ORDER BY Nivo DESC ) Nivo
+				FROM	Tree
+			) P
+	WHERE	Nivo = 1]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>sourceFindAll</Title>
+      <Shortcut>sourceFindAll</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations>
+        <Literal>
+          <ID>objectName</ID>
+          <ToolTip />
+          <Default />
+        </Literal>
+      </Declarations>
+      <Code Language="sql"><![CDATA[SELECT DISTINCT
+        OBJECT_SCHEMA_NAME(id) AS Shema
+,       OBJECT_NAME(id) AS Naziv
+,       CASE WHEN OBJECTPROPERTY(id, 'IsProcedure') = 1 THEN 'Procedura'
+             WHEN OBJECTPROPERTY(id, 'IsTrigger') = 1 THEN 'Trigger'
+             WHEN OBJECTPROPERTY(id, 'IsView') = 1 THEN 'View'
+             WHEN OBJECTPROPERTY(id, 'IsScalarFunction') = 1
+                  OR OBJECTPROPERTY(id, 'IsInlineFunction') = 1
+                  OR OBJECTPROPERTY(id, 'IsTableFunction') = 1 THEN 'UDF'
+             WHEN OBJECTPROPERTY(id, 'IsTable') = 1 THEN 'Tablica'
+        END AS Tip
+,       CASE WHEN OBJECTPROPERTY(id, 'IsProcedure') = 1 THEN 'exec ' 
+WHEN OBJECTPROPERTY(id, 'IsTrigger') = 1 THEN 'ALTER TRIGGER '
+ELSE 'SELECT * FROM ' END +OBJECT_SCHEMA_NAME(id) +'.' + OBJECT_NAME(id) NazivSaShemom
+FROM    syscomments
+WHERE   [text] LIKE '%$objectName$%' 
+ORDER BY OBJECT_SCHEMA_NAME(id)
+,       OBJECT_NAME(id)
+ 
+]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>TableTempIfExistsDrop</Title>
+      <Shortcut>TableTempIfExistsDrop</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[IF OBJECT_ID('tempdb..#Results') IS NOT NULL DROP TABLE #Results
+]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

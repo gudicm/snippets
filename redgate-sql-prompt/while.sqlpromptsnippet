@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>while</Title>
+      <Shortcut>while</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[DECLARE @Flag INT;
+SET @Flag = 1;
+WHILE (@Flag < 10)
+BEGIN
+    
+     -- todo : actual implementation
+    BEGIN
+        PRINT @Flag;
+        SET @Flag = @Flag + 1;
+    END;
+    IF (@Flag > 5)
+        BREAK;
+    ELSE
+        CONTINUE;
+END;
+]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

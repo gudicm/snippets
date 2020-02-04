@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>columnFind</Title>
+      <Shortcut>columnFind</Shortcut>
+      <Description>find column across tables</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations>
+        <Literal>
+          <ID>PART_OF_NAME</ID>
+          <ToolTip />
+          <Default />
+        </Literal>
+      </Declarations>
+      <Code Language="sql"><![CDATA[SELECT OBJECT_SCHEMA_NAME(id), name
+FROM sysobjects WHERE id IN ( SELECT id FROM syscolumns WHERE name like '%$PART_OF_NAME$%' ) 
+AND OBJECTPROPERTY(id, 'IsTable') = 1
+]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

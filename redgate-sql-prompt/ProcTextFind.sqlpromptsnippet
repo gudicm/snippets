@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>ProcTextFind</Title>
+      <Shortcut>ProcTextFind</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[SELECT OBJECT_SCHEMA_NAME(id) AS Shema, OBJECT_NAME(id) AS Naziv
+FROM syscomments 
+WHERE [text] LIKE '%mojtekst%' 
+AND OBJECTPROPERTY(id, 'IsProcedure') = 1 
+GROUP BY OBJECT_SCHEMA_NAME(id), OBJECT_NAME(id)
+ORDER BY OBJECT_SCHEMA_NAME(id), OBJECT_NAME(id)
+]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>clrStrictSecurity</Title>
+      <Shortcut>clrStrictSecurity</Shortcut>
+      <Description>configuration of CLR security</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[-- run before assembly import
+-- to be able to import safe assembly
+EXEC sp_configure 'show advanced options', 1
+RECONFIGURE;
+EXEC sp_configure 'clr strict security', 0;
+RECONFIGURE;
+
+EXEC master.sys.sp_executesql N'GRANT UNSAFE ASSEMBLY TO [SQLWebRequest];';
+EXEC sp_configure 'clr strict security', 1; RECONFIGURE;]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>ut</Title>
+      <Shortcut>ut</Shortcut>
+      <Description>update table</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[UPDATE FINIZV.SPSAOPPracRacuni
+SET DatumPrejema = ''
+WHERE PkSPSAOPPracRacuni = 26493343]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

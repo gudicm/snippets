@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>DecimalPlaces</Title>
+      <Shortcut>DecimalPlaces</Shortcut>
+      <Description>number of decimal places</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[-- number of decimal places
+SELECT 41385.42, SQL_VARIANT_PROPERTY(41385.42,'Scale')]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

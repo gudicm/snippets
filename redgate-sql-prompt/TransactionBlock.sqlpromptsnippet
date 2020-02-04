@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>TransactionBlock</Title>
+      <Shortcut>TransactionBlock</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[BEGIN TRY
+    BEGIN TRANSACTION;
+
+    --update/insert/delete
+
+    ROLLBACK TRANSACTION; --TEMP, zakomentirati ako je dobro da se odradi commit
+    IF @@TRANCOUNT > 0
+    BEGIN
+        COMMIT TRANSACTION;
+        SELECT 'Commit';
+    END;
+    ELSE
+        SELECT 'Rollback';
+END TRY
+BEGIN CATCH
+    SELECT ERROR_MESSAGE() Greska;
+    IF @@TRANCOUNT > 0
+        ROLLBACK TRANSACTION;
+END CATCH;]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>TableByTriggerFind</Title>
+      <Shortcut>TableByTriggerFind</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[SELECT name as table_name 
+FROM sys.all_objects 
+WHERE type = 'U' AND 
+object_id = ( SELECT parent_object_id FROM sys.all_objects WHERE type = 'TR' and name = 'Trigger_Name')
+]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>begin</Title>
+      <Shortcut>begin</Shortcut>
+      <Description>begin block</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[BEGIN
+    -- todo: actual implementation
+    PRINT '';
+END;]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

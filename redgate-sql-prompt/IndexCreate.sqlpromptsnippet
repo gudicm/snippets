@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>IndexCreate</Title>
+      <Shortcut>IndexCreate</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[CREATE INDEX idx_pname
+ON Persons (LastName, FirstName);]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

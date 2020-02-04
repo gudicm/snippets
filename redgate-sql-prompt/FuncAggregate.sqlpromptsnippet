@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>FuncAggregate</Title>
+      <Shortcut>FuncAggregate</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[ALTER FUNCTION [schema].[frName]
+	(
+		@param INT
+	)
+RETURNS INT
+AS
+	BEGIN
+		DECLARE @Ukupno INT
+		SELECT @Ukupno = COUNT(*) FROM Aplikacija.tTree WHERE ParentID = @TreeID
+		RETURN @Ukupno
+	END]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>ProcCreate</Title>
+      <Shortcut>ProcCreate</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations>
+        <Literal>
+          <ID>ProcName</ID>
+          <ToolTip />
+          <Default />
+        </Literal>
+      </Declarations>
+      <Code Language="sql"><![CDATA[SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		<Author,,Name>
+-- Create date: <Create Date,,>
+-- Description:	<Description,,>
+-- =============================================
+CREATE PROCEDURE dbo.$ProcName$ 
+	-- Add the parameters for the stored procedure here
+(
+	@SomeParam int
+)
+AS
+BEGIN
+	SELECT GETDATE()
+
+	RETURN 0;
+END]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

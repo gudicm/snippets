@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>tableFind</Title>
+      <Shortcut>tableFind</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[SELECT * FROM sys.all_objects
+WHERE name LIKE '%Ovjera%'
+AND type_desc like '%TABLE%']]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

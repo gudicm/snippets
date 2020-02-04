@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>ProcReturn</Title>
+      <Shortcut>ProcReturn</Shortcut>
+      <Description>return value from procedure</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[DECLARE @ret INT
+EXEC @ret= FINIZV.spFromPRACRacuniToVrsticeDDV @PkSPSAOPPracRacuni = 27131104, @Leto = 2019
+SELECT @ret]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

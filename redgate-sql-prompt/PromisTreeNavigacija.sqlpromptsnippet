@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>PromisTreeNavigacija</Title>
+      <Shortcut>PromisTreeNavigacija</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[WITH Tree
+       (
+               PkNavigacija
+             , PkNavigacijaParent
+             , Tekst
+             , Putanja
+       )
+       AS (
+       SELECT 
+               PkNavigacija
+             , PkNavigacijaParent
+             , Tekst
+             , CAST('' AS NVARCHAR(4000)) Putanja
+             FROM Aplikacija.Navigacija
+             WHERE PkNavigacijaParent IS NULL
+       UNION ALL
+       SELECT
+               T.PkNavigacija
+             , T.PkNavigacijaParent 
+             , T.Tekst
+             , Tree.Putanja + Tree.Tekst + CAST('\' AS NVARCHAR(4000)) 
+             FROM Aplikacija.Navigacija AS T
+             INNER JOIN
+             Tree ON T.PkNavigacijaParent = Tree.PkNavigacija
+       )
+       
+       SELECT * FROM Tree
+]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

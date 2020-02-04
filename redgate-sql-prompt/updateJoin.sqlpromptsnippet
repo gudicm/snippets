@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>updateJoin</Title>
+      <Shortcut>updateJoin</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[UPDATE sod
+		SET sod.ModifiedDate = soh.ModifiedDate 
+		FROM AdventureWorks2008.Sales.SalesOrderHeader soh
+		INNER JOIN AdventureWorks2008.Sales.SalesOrderDetail sod
+		ON soh.SalesOrderID = sod.SalesOrderID
+]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

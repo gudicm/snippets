@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>linkServ</Title>
+      <Shortcut>linkServ</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[--EXEC sp_linkedservers
+EXEC sp_linkedservers
+]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

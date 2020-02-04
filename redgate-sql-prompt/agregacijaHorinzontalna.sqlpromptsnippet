@@ -1,0 +1,84 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>agregacijaHorinzontalna</Title>
+      <Shortcut>agregacijaHorinzontalna</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[
+SELECT t1.PkRadniNalog,
+       t1.PkMaterijalnoDobro,
+       t1.ZadnjaVizualnaOvjera,
+       t1.VizualnaOvjeraStatus, 
+		t2.ZadnjaDimenzionalnaOvjera,
+		t2.DimenzionalnaOvjeraStatus,
+		t3.ZadnjaTezinskaOvjera,
+        t3.TezinskaOvjeraStatus
+	   FROM 
+(
+
+	SELECT 
+	ovp.PkRadniNalog, 
+	ovp.PkMaterijalnoDobro,
+	ovp.ZadnjeVrijemeOvjere ZadnjaVizualnaOvjera,
+	CASE WHEN ovp.VizualnaOvjeraStatus = 1 THEN 'OK'
+		 ELSE 'NOK' END AS VizualnaOvjeraStatus
+	FROM dbo.EvidencijaOvjereProizvodnje ovp
+	INNER JOIN (
+	SELECT PkMaterijalnoDobro,
+		   MAX(PkEvidencijaOvjere) PkEvidencijaOvjere
+	FROM dbo.EvidencijaOvjereProizvodnje
+	WHERE VizualnaOvjeraStatus IS NOT NULL
+	GROUP BY PkMaterijalnoDobro
+	) vo ON ovp.PkEvidencijaOvjere = vo.PkEvidencijaOvjere
+) t1
+LEFT JOIN (
+
+SELECT 
+	ovp.PkRadniNalog, 
+	ovp.PkMaterijalnoDobro,
+	ovp.ZadnjeVrijemeOvjere ZadnjaDimenzionalnaOvjera,
+	CASE WHEN ovp.DimezionalnaOvjeraStatus = 1 THEN 'OK'
+		 ELSE 'NOK' END AS DimenzionalnaOvjeraStatus
+	FROM dbo.EvidencijaOvjereProizvodnje ovp
+	INNER join
+	(
+	SELECT PkMaterijalnoDobro,
+		   MAX(PkEvidencijaOvjere) PkEvidencijaOvjere
+	FROM dbo.EvidencijaOvjereProizvodnje
+	WHERE DimezionalnaOvjeraStatus IS NOT NULL
+	GROUP BY PkMaterijalnoDobro
+	) vo ON ovp.PkEvidencijaOvjere = vo.PkEvidencijaOvjere
+
+) t2 ON t2.PkMaterijalnoDobro = t1.PkMaterijalnoDobro
+LEFT JOIN (
+
+	SELECT 
+	ovp.PkRadniNalog, 
+	ovp.PkMaterijalnoDobro,
+	ovp.ZadnjeVrijemeOvjere ZadnjaTezinskaOvjera,
+	CASE WHEN ovp.TezinskaOvjeraStatus = 1 THEN 'OK'
+		 ELSE 'NOK' END AS TezinskaOvjeraStatus
+	FROM dbo.EvidencijaOvjereProizvodnje ovp
+	INNER join
+	(
+	SELECT PkMaterijalnoDobro,
+		   MAX(PkEvidencijaOvjere) PkEvidencijaOvjere
+	FROM dbo.EvidencijaOvjereProizvodnje
+	WHERE TezinskaOvjeraStatus IS NOT NULL
+	GROUP BY PkMaterijalnoDobro
+	) vo ON ovp.PkEvidencijaOvjere = vo.PkEvidencijaOvjere
+
+
+) t3	ON t3.PkMaterijalnoDobro = t1.PkMaterijalnoDobro
+]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

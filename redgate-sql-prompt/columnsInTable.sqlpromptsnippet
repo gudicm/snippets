@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>columnsInTable</Title>
+      <Shortcut>columnsInTable</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[SELECT OBJECT_SCHEMA_NAME (c.object_id) SchemaName,
+        o.Name AS Table_Name, 
+		c.Name AS Field_Name,
+		o.object_id AS Id_Object,
+		c.column_id AS Column_Id,
+        t.Name AS Data_Type,
+        t.max_length AS Length_Size,
+        t.precision AS Precision
+FROM sys.columns c 
+     INNER JOIN sys.objects o ON o.object_id = c.object_id
+     LEFT JOIN  sys.types t on t.user_type_id  = c.user_type_id   
+WHERE o.type = 'U'
+and o.Name = 'SAOPPDVPromet'
+AND OBJECT_SCHEMA_NAME (c.object_id) = 'dbo']]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

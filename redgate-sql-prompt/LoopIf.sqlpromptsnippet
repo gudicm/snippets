@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>LoopIf</Title>
+      <Shortcut>LoopIf</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[IF @cost <= @compareprice 
+BEGIN
+    PRINT 'These products can be purchased for less than 
+    $'+RTRIM(CAST(@compareprice AS varchar(20)))+'.'
+END
+ELSE
+    PRINT 'The prices for all products in this category exceed 
+    $'+ RTRIM(CAST(@compareprice AS varchar(20)))+'.'
+END]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

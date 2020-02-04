@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>clrUnrestricted</Title>
+      <Shortcut>clrUnrestricted</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[-- in order to import unrestricted CLRs
+-- change db owner
+EXEC sp_changedbowner 'sa'
+-- change TRUSTWORTHY on db
+ALTER DATABASE promisdevelop SET TRUSTWORTHY ON;]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

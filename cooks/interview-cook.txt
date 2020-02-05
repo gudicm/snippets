@@ -1,0 +1,32 @@
+C#
+- diff array vs List?
+- what kind of collections exist?
+- search of the list?
+- abstract class vs interface
+- design patterns?
+- factory pattern?
+- singleton pattern?
+
+- break vs  continue 
+break interrupts loop  (breaks the loop)
+continue breaks current iteration and continues from next
+
+
+SQL
+- definition of index?
+- kind of join?
+	inner,left, right, full, cross
+- explain transaction?
+
+- explain left join? 
+
+Angular 
+- diff between Component and Module?
+
+HR PRODIGY:
+
+- function to calculate difference  between 2 dates  
+- return duplicates list from array, function.
+- sql : number of value within record without max and min occurence.
+- proposition of for solution of url mapping in controller
+- explanation of mvc controller, modelview 

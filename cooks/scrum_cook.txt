@@ -1,0 +1,12 @@
+SCRUM tutorial(just basic definition of process with basic term definition)
+
+Agile dAgile development is based on iterative incremental model, goes with sprint cyclus, cyclus will be repeated until 
+software accomplishes defined functionality
+
+Product Backlog
+The Product Backlog is an ordered list of features that are needed as part of the end product and it is the single source of 
+requirements for any changes to be made to the product.
+
+Sprint Backlog
+The Sprint Backlog is the set of Product Backlog items selected for the Sprint, plus a plan for delivering the product Increment
+and realizing the Sprint Goal.

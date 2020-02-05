@@ -1,0 +1,81 @@
+-- Disable Git SSL verification in the server 
+git config --global http.sslVerify false
+
+
+commit  - commit changes to local branch
+sync  	- synchronize  local branch with remote branch, but will not propagate local changes to remote
+push 	- pushing local branch to remote branch
+-- definition
+-- stage - adding a files to pool of folders/files to be commit
+-- stash - preserve state of staged files when changing a branch and addressing a project in later timeline
+
+
+
+
+git clone https://github.com/libgit2/libgit2
+git -c http.sslVerify=false clone https://example.com/path/to/git  -- to prevent ssl self signed certificates
+
+git clone https://Gudicm74@bitbucket.org/Gudicm74/test.git
+git branch    														-- tells current branch(checkouted)
+git checkout <branch_name>											-- switch to a specific branch
+git branch -d <branch_name>											-- deletes specific branch if branch is not checkout
+
+
+
+
+git init 			-- init command
+git init --bare
+git status 			-- checks the status of files that can be commited (untracked, tracked and modified)
+
+git add [some files]       				# add [some files] to staging area
+git add [some more files]  				# add [some more files] to staging area
+git commit                 				# commit [some files] and [some more files]
+git commit -m [message]                 # commit [some files] and [some more files]
+
+# sync procedure via commands
+git fetch upstream						# fetch the chamges for remote brancjh and stores it to lacal master branch
+git checkout master						# makes checkout of the local branch
+git merge upsteam/master 				sync local master with remote(upstream) branch
+
+git stash                     			# remove all changes from HEAD and save them somewhere else
+git checkout <other-project>  			# change branches
+git cherry-pick <commit-id>   			# pick a commit from ANY branch and apply it to the current
+git checkout <first-project>  			# change to the other branch
+git stash pop                 			# restore all changes again
+
+git restart								# rollback to previous version
+
+-- get specific commit version from master(local_branch)
+git checkout <commit-id> 
+-- get the latest version
+git checkout - 
+
+-- return to last commit, all changes to current view will be unmade(released)
+git reset --hard HEAD
+
+-- provide username and password with git repo
+git clone https://username:password@github.com/username/repository.git
+https://github.com/gudicm/Basics
+
+git clone https://gudicm:Gudmar974278@github.com/gudicm/EfCoreTutorial.git
+git clone https://gudicm:Gudmar974278@github.com/gudicm/eTommy.git
+
+https://github.com/gudicm/AspNet.Core.Api.Tutorial.git
+
+-- resolve issue with https connect
+$ git config credential.helper store
+$ git push https://github.com/repo.git
+
+
+Username for 'https://github.com': <USERNAME>
+Password for 'https://USERNAME@github.com': <PASSWORD>
+
+git config --global credential.helper 'cache --timeout 7200'
+
+
+-- connect with ssh key
+ssh://git@github.com/username/repo.git
+
+-- generate key generate
+ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
+

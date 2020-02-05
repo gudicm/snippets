@@ -1,0 +1,10 @@
+@rem ### COMMANDS ###
+echo 'test string '>> test.txt
+mkdir fol_name 
+xcopy /path1/source_folder /path2/dest_folder
+rename original_file new_file_name
+
+
+@rem ### COMMANDS ###@
+@rem delete all dir with specific naem
+FOR /d /r . %d IN (dirName) DO @IF EXIST "%d" rd /s /q "%d"

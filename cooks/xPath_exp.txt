@@ -1,0 +1,29 @@
+xPath = //tagname[@Attribute='Value']
+- types
+- absolute
+-relative
+
+-- relative
+-- basic
+//input[@type='text']				
+//label[@id='message23']
+//input[@value='RESET']
+//*[@class='barone']
+//a[@href='http://demo.guru99.com/']
+ //img[@src='//cdn.guru99.com/images/home/java.png']
+//input[@name='uid']
+//*[@class='featured-box']//*[text()='Testing']		any elem, with class and specified text
+
+-- CONTAINS to used when attribute value is dinamically changed
+Xpath=//*[contains(@type,'sub')]  
+Xpath=.//*[contains(@name,'btn')]
+Xpath=//*[contains(@id,'message')]
+Xpath=//*[contains(@href,'guru99.com')]	
+-- Using OR & AND --
+Xpath=//*[@type='submit' OR @name='btnReset']
+
+-- Start-with function --
+Xpath=//label[starts-with(@id,'message')]
+
+-- Text --
+Xpath=//td[text()='UserID']

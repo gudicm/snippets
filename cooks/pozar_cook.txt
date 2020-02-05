@@ -1,0 +1,7 @@
+- 	gorenje
+- 	trokut gorenja
+- 	temperatura samozapaljenja
+-	prijenos topline,(kondukcija,konvekcija ili radijacija)
+-   eksplozija
+-   granice eksplozivnosti 
+ 

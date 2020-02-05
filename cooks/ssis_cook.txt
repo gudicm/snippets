@@ -1,0 +1,11 @@
+Package - SSIS programming unit
+Control Flow	-  workflow of the package, tasks that can be connected with flow constraints
+Flow constraint - defined execution priority of each task within package
+
+Task			- defined programming block with package
+Data task 		- task for data extract an data transform
+Sources 		- defines data sources
+Destinations	- components for data destinations
+
+Transform
+Conditional Split	- data filtering according to different conditions specified

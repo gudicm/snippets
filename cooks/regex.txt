@@ -1,0 +1,42 @@
+regex
+123								->\d\d\d						any digit '\d'
+abc123xyz						->\Dbc\d23xyz					any non digit '\D'
+a1+.							...\.							any character '.',not match '\.'
+not macth period '\.pdf' will exclude pdf extension
+can, man, fan					[cmf]an							matching specific character [abc]
+																excluding specif characters [^abc]
+[A-C] from A to C uppercase
+[0-6] nujmbers fro 0 to 6
+[A-Za-z0-9_] all characters in english text
+abc, 123						1\wc							alfanumeric character \w
+								\W								non alfanumeric character \W
+wazzzzzup						waz{5}up						{m} repetitions
+aabbbbc							a{2,4}b{0,4}c{1,2}				{m-n} repetitions
+aaaabcc,aabbbbc,aacc			aa+b*c+							* zero or more repetitons
+aaaabcc,aabbbbc,aacc											+ one or more repetitions
+																? optional character
+1 file found?					\d+ files? found\?
+2 files found?					\d+ files? found\?
+24 files found?					\d+ files? found\?
+																\s any whitespace(space, tab, new line, cariage return)
+Match	1.   abc	Success
+Match	2.	abc	Success
+Match	3.           abc
+Match	3.           abc
+Mission succesfull				^Mission															^ begin of line
+Mission succesfull				ple$																$ end of line
+																									capture groups(...)
+file_record_transcript.pdf
+file_07241999.pdf				^(file.*)\.pdf									definition for filename excluding extension
+(a(bcd))																		capture subgroups
+
+examples:
+<xsd:documentation>(.*)</xsd:documentation>					remove node in xml where <xsd:documentation> is node
+
+REGEX_REPLACE
+SELECT regexp_replace('test1   test2 test3', '[[:space:]]+', ';') AS col FROM sys.dual; -- multiple spaces with single
+SELECT regexp_replace('test1   test2 test3', '[[:space:]]+', ';') AS col FROM sys.dual; -- with semicolon
+
+REGEX C#
+[^\S\r\n]{2,}											// 2 and more blanks with white spaces
+^[ \t]*$\r?\n											// empty lines (to find, repplace or delete)

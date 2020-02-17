@@ -1,0 +1,88 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>pocoSimple</Title>
+      <Shortcut>pocoSimple</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[declare @tableName varchar(200)
+declare @columnName varchar(200)
+declare @nullable varchar(50)
+declare @datatype varchar(50)
+declare @maxlen int
+
+declare @sType varchar(50)
+declare @sProperty varchar(200)
+
+DECLARE table_cursor CURSOR FOR 
+SELECT TABLE_NAME
+FROM [INFORMATION_SCHEMA].[TABLES]
+where table_name like '%tblName%'
+
+OPEN table_cursor
+
+FETCH NEXT FROM table_cursor 
+INTO @tableName
+
+WHILE @@FETCH_STATUS = 0
+BEGIN
+
+PRINT 'public class ' + @tableName + ' {'
+
+    DECLARE column_cursor CURSOR FOR 
+    SELECT COLUMN_NAME, IS_NULLABLE, DATA_TYPE, isnull(CHARACTER_MAXIMUM_LENGTH,'-1') 
+  from [INFORMATION_SCHEMA].[COLUMNS] 
+	WHERE [TABLE_NAME] = @tableName
+	order by [ORDINAL_POSITION]
+
+    OPEN column_cursor
+    FETCH NEXT FROM column_cursor INTO @columnName, @nullable, @datatype, @maxlen
+
+    WHILE @@FETCH_STATUS = 0
+    BEGIN
+
+	-- datatype
+	select @sType = case @datatype
+	when 'int' then 'int'
+	WHEN 'decimal' THEN 'decimal'
+	WHEN 'money' THEN 'decimal'
+	WHEN 'char' THEN 'string'
+	WHEN 'nchar' THEN 'string'
+	WHEN 'varchar' THEN 'string'
+	WHEN 'nvarchar' THEN 'string'
+	WHEN 'uniqueidentifier' THEN 'Guid'
+	WHEN 'datetime' THEN 'DateTime'
+	WHEN 'bit' THEN 'bool'
+	ELSE 'string'
+	END
+
+		IF (@nullable = 'NO')
+			PRINT '[Required]'
+		IF (@sType = 'String' AND @maxLen <> '-1')
+			PRINT '[MaxLength(' +  CONVERT(VARCHAR(4),@maxLen) + ')]'
+		SELECT @sProperty = 'public ' + @sType + ' ' + @columnName + ' { get; set;}'
+		PRINT @sProperty
+
+		PRINT ''
+		FETCH NEXT FROM column_cursor INTO @columnName, @nullable, @datatype, @maxlen
+	END
+    CLOSE column_cursor
+    DEALLOCATE column_cursor
+
+	PRINT '}'
+	PRINT ''
+    FETCH NEXT FROM table_cursor 
+    INTO @tableName
+END
+CLOSE table_cursor
+DEALLOCATE table_cursor]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

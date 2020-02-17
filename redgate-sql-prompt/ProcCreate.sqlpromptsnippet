@@ -13,7 +13,12 @@
     <Snippet>
       <Declarations>
         <Literal>
-          <ID>ProcName</ID>
+          <ID>proc-name</ID>
+          <ToolTip />
+          <Default />
+        </Literal>
+        <Literal>
+          <ID>param-name</ID>
           <ToolTip />
           <Default />
         </Literal>
@@ -25,10 +30,10 @@ GO
 -- Create date: <Create Date,,>
 -- Description:	<Description,,>
 -- =============================================
-CREATE PROCEDURE dbo.$ProcName$ 
+CREATE PROCEDURE dbo.$proc-name$ 
 	-- Add the parameters for the stored procedure here
 (
-	@SomeParam int
+	@$param-name$ int
 )
 AS
 BEGIN

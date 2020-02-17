@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>serverProcesors</Title>
+      <Shortcut>serverProcesors</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[SELECT cpu_count AS [Logical CPU Count], hyperthread_ratio AS [Hyperthread Ratio],
+cpu_count/hyperthread_ratio AS [Physical CPU Count],
+physical_memory_kb/(1024*1024) AS [Physical Memory (GB)]
+FROM sys.dm_os_sys_info OPTION (RECOMPILE);]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

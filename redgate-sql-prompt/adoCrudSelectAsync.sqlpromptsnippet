@@ -1,0 +1,190 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>adoCrudSelectAsync</Title>
+      <Shortcut>adoCrudSelectAsync</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[
+DECLARE @TableName VARCHAR(50), @Schema VARCHAR(20), @Entity VARCHAR(20)
+DECLARE @Code VARCHAR(8000), @ReaderCode VARCHAR(4000);
+DECLARE @ColumnName VARCHAR(50), @DataType VARCHAR(50), @ConvDataType VARCHAR(50), @Reader VARCHAR(100), @IsNullable VARCHAR(3)
+DECLARE	@RowCount INT, @RowSet INT
+DECLARE	@ToEnd BIT = 0
+DECLARE @TableColumns TABLE (
+RowID INT NOT NULL PRIMARY KEY IDENTITY(1,1),  
+SchemaName VARCHAR(128),
+Table_Name VARCHAR(128),
+Field_Name VARCHAR(128),
+Id_Object INT NOT NULL	,
+Column_Id INT NOT NULL,
+Data_Type VARCHAR(128),
+SqlDataType VARCHAR(128),
+Length_Size INT NOT NULL,
+Precision INT,	
+IsNullable BIT
+)
+
+BEGIN
+
+SET @TableName = 'Users'
+SET @Schema = 'dbo'
+SET @Entity = 'User'
+
+
+INSERT INTO @TableColumns
+(
+    SchemaName,
+    Table_Name,
+    Field_Name,
+    Id_Object,
+    Column_Id,
+    Data_Type,
+	SqlDataType,
+    Length_Size,
+    Precision,
+	IsNullable
+)
+SELECT CAST(OBJECT_SCHEMA_NAME(c.object_id) AS NVARCHAR(128)) SchemaName,
+       CAST(o.name AS NVARCHAR(128)) AS Table_Name,
+       CAST(c.name AS NVARCHAR(128)) AS Field_Name,
+       o.object_id AS Id_Object,
+       c.column_id AS Column_Id,
+       CAST(t.name AS NVARCHAR(128)) AS Data_Type,
+	   CASE 
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'bigint' THEN 'Int64'
+			WHEN CAST(t.name AS NVARCHAR(128))= 'binary' THEN 'Binary'
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'bit' THEN 'Boolean'
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'char' THEN 'Char'
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'datetime' THEN 'DateTime'
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'datetime2' THEN 'DateTime'
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'decimal' THEN 'Decimal'	
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'float' THEN 'Double'	
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'int' THEN 'Int32'	
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'money' THEN 'Decimal'
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'numeric' THEN 'Decimal'
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'nvarchar' THEN 'String'
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'numeric' THEN 'Decimal'
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'varchar' THEN 'String'
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'xml' THEN 'Xml'
+			ELSE 'Object'																																	
+	   END  AS SqlDataType,
+	   t.max_length AS Length_Size,
+       t.precision AS Precision,
+	   c.is_nullable AS IsNullable
+FROM sys.columns c
+    INNER JOIN sys.objects o
+        ON o.object_id = c.object_id
+    LEFT JOIN sys.types t
+        ON t.user_type_id = c.user_type_id
+WHERE o.type = 'U'
+      AND o.name = @TableName
+      AND OBJECT_SCHEMA_NAME(c.object_id) = @Schema;
+
+SET @RowSet = @@ROWCOUNT
+
+SELECT * FROM @TableColumns
+
+IF(@RowSet = 0)
+BEGIN
+	SET @ToEnd = 1
+    GOTO endBlock
+
+END;	
+
+SET @RowCount = 1
+WHILE (@RowCount <= @RowSet)
+BEGIN
+	SELECT @ColumnName = Field_Name, 
+	@DataType = SqlDataType,
+	@IsNullable = (CASE 
+					WHEN IsNullable = 1 THEN '?'
+					ELSE ''
+	              END),
+	@ConvDataType = (CASE 
+					WHEN SqlDataType = 'int' THEN 'int'
+					WHEN SqlDataType = 'Int16' THEN 'int'
+					WHEN SqlDataType = 'Int32' THEN 'int'
+					WHEN SqlDataType = 'Int64' THEN 'int'
+					WHEN SqlDataType= 'String' THEN 'string'
+					WHEN SqlDataType = 'String' THEN 'String'
+					WHEN SqlDataType = 'Char' THEN 'char'
+					WHEN SqlDataType = 'Datetime' THEN 'DateTime'
+					WHEN SqlDataType = 'Decimal' THEN 'decimal'	
+					WHEN SqlDataType = 'Double' THEN 'double'	
+					WHEN SqlDataType = 'Boolean' THEN 'bool'	
+					WHEN SqlDataType = 'Xml' THEN 'string'
+					ELSE 'object'																																	
+					END) 					 
+	FROM @TableColumns WHERE RowID = @RowCount
+
+	IF(@IsNullable='?')
+		SELECT 	@Reader = CASE 
+							WHEN @ConvDataType = 'string' THEN CONCAT(@ColumnName,' = reader["', @ColumnName,'"] as ',@ConvDataType)
+							WHEN @ConvDataType = 'bool' THEN CONCAT(@ColumnName,' = reader["', @ColumnName,'"] as ',@ConvDataType, @IsNullable)
+							WHEN @ConvDataType = 'int' THEN CONCAT(@ColumnName,' = reader["', @ColumnName,'"] as ',@ConvDataType, @IsNullable)
+							WHEN @ConvDataType = 'decimal' THEN CONCAT(@ColumnName,' = reader["', @ColumnName,'"] as ',@ConvDataType, @IsNullable)
+							WHEN @ConvDataType = 'double' THEN CONCAT(@ColumnName,' = reader["', @ColumnName,'"] as ',@ConvDataType, @IsNullable)
+							ELSE CONCAT(@ColumnName,' = reader["', @ColumnName,'"] as ',@ConvDataType)
+						  END	  
+		FROM @TableColumns WHERE RowID = @RowCount
+	ELSE 			 	
+		SELECT 	@Reader  = CONCAT(@ColumnName,' = (',@ConvDataType,')reader["', @ColumnName,'"]')
+
+	Set @ReaderCode = CONCAT(@readerCode,
+	CHAR(9),CHAR(9),CHAR(9),CHAR(9),CHAR(9),CHAR(9),CHAR(9),@Reader, ',',CHAR(13))
+	SET @RowCount = @RowCount +1 	 
+END
+
+
+SET @Code = CONCAT(
+	'// GENERATED CODE', CHAR(13),
+	'public async Task<List<',@Entity,'>> Get',@TableName,'Async(string connStr)',CHAR(13),
+	'{', CHAR(13),
+	 CHAR(9),'var list = new List<',@Entity,'>();',CHAR(13),
+	 CHAR(9),'var sql = ','"','SELECT * from ',@Schema,'.',@TableName,'";',CHAR(13),
+	CHAR(9),'using (var conn = new SqlConnection(connStr))',CHAR(13),	
+	CHAR(9),'using (var cmd = new SqlCommand(sql, conn))',CHAR(13),
+    CHAR(9),'{', CHAR(13),
+	CHAR(9),CHAR(9),'await conn.OpenAsync();',CHAR(13),
+	CHAR(9),CHAR(9),' using (var reader = await cmd.ExecuteReaderAsync())',CHAR(13),
+	CHAR(9),CHAR(9),CHAR(9),'{',CHAR(13),
+	CHAR(9),CHAR(9),CHAR(9),CHAR(9),'while (await reader.ReadAsync())',CHAR(13),
+	CHAR(9),CHAR(9),CHAR(9),CHAR(9),CHAR(9),'{',CHAR(13),
+	CHAR(9),CHAR(9),CHAR(9),CHAR(9),CHAR(9),CHAR(9),'var ',LOWER(@Entity),' = new ',@Entity,CHAR(13),
+	CHAR(9),CHAR(9),CHAR(9),CHAR(9),CHAR(9),CHAR(9),'{',CHAR(13),
+	-- to be reader string
+	@readerCode, CHAR(13),
+	CHAR(9),CHAR(9),CHAR(9),CHAR(9),CHAR(9),CHAR(9),'};',CHAR(13),
+	CHAR(9),CHAR(9),CHAR(9),CHAR(9),CHAR(9),CHAR(9),'list.Add(',LOWER(@Entity),');',CHAR(13),
+	CHAR(9),CHAR(9),CHAR(9),CHAR(9),CHAR(9),'}',CHAR(13),
+	CHAR(13),
+
+	CHAR(9),CHAR(9),CHAR(9),'}',CHAR(13),
+	CHAR(9),'}', CHAR(13),
+	CHAR(9),'return list;', CHAR(13),
+    '}',CHAR(13),
+	'// GENERATED CODE', CHAR(13)
+)
+
+SELECT @Code
+PRINT @Code
+
+endBlock:
+	IF(@ToEnd = 1)
+		SELECT 'Table with name ' + @Schema + '.' + @TableName ' not found'
+
+END;
+
+
+]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

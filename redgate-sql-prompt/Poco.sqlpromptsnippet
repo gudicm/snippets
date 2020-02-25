@@ -11,84 +11,110 @@
       </SnippetTypes>
     </Header>
     <Snippet>
-      <Declarations>
-        <Literal>
-          <ID>tblName</ID>
-          <ToolTip />
-          <Default />
-        </Literal>
-      </Declarations>
-      <Code Language="sql"><![CDATA[declare @tableName varchar(200)
-declare @columnName varchar(200)
-declare @nullable varchar(50)
-declare @datatype varchar(50)
-declare @maxlen int
+      <Declarations />
+      <Code Language="sql"><![CDATA[DECLARE @tableName VARCHAR(200);
+DECLARE @columnName VARCHAR(200);
+DECLARE @nullable VARCHAR(50),
+        @nullOperator VARCHAR(3);
+DECLARE @datatype VARCHAR(50);
+DECLARE @maxlen INT;
 
-declare @sType varchar(50)
-declare @sProperty varchar(200)
+DECLARE @sType VARCHAR(50);
+DECLARE @sProperty VARCHAR(200);
 
-DECLARE table_cursor CURSOR FOR 
+DECLARE table_cursor CURSOR FOR
 SELECT TABLE_NAME
 FROM [INFORMATION_SCHEMA].[TABLES]
-where table_name like '%$tblName$%'
+WHERE TABLE_NAME LIKE '%Users%';
 
-OPEN table_cursor
+OPEN table_cursor;
 
-FETCH NEXT FROM table_cursor 
-INTO @tableName
+FETCH NEXT FROM table_cursor
+INTO @tableName;
 
 WHILE @@FETCH_STATUS = 0
 BEGIN
 
-PRINT 'public class ' + @tableName + ' {'
+    PRINT 'public class ' + @tableName + ' {';
 
-    DECLARE column_cursor CURSOR FOR 
-    SELECT COLUMN_NAME, IS_NULLABLE, DATA_TYPE, isnull(CHARACTER_MAXIMUM_LENGTH,'-1') 
-  from [INFORMATION_SCHEMA].[COLUMNS] 
-	WHERE [TABLE_NAME] = @tableName
-	order by [ORDINAL_POSITION]
+    DECLARE column_cursor CURSOR FOR
+    SELECT COLUMN_NAME,
+           IS_NULLABLE,
+           DATA_TYPE,
+           ISNULL(CHARACTER_MAXIMUM_LENGTH, '-1')
+    FROM [INFORMATION_SCHEMA].[COLUMNS]
+    WHERE [TABLE_NAME] = @tableName
+    ORDER BY [ORDINAL_POSITION];
 
-    OPEN column_cursor
-    FETCH NEXT FROM column_cursor INTO @columnName, @nullable, @datatype, @maxlen
+    OPEN column_cursor;
+    FETCH NEXT FROM column_cursor
+    INTO @columnName,
+         @nullable,
+         @datatype,
+         @maxlen;
 
     WHILE @@FETCH_STATUS = 0
     BEGIN
 
-	-- datatype
-	select @sType = case @datatype
-	when 'int' then 'Int32'
-	when 'decimal' then 'Decimal'
-	when 'money' then 'Decimal'
-	when 'char' then 'String'
-	when 'nchar' then 'String'
-	when 'varchar' then 'String'
-	when 'nvarchar' then 'String'
-	when 'uniqueidentifier' then 'Guid'
-	when 'datetime' then 'DateTime'
-	when 'bit' then 'Boolean'
-	else 'String'
-	END
+        -- datatype
+        SELECT @sType = CASE @datatype
+                            WHEN 'int' THEN
+                                'Int32'
+                            WHEN 'decimal' THEN
+                                'Decimal'
+                            WHEN 'money' THEN
+                                'Decimal'
+                            WHEN 'char' THEN
+                                'String'
+                            WHEN 'nchar' THEN
+                                'String'
+                            WHEN 'varchar' THEN
+                                'String'
+                            WHEN 'nvarchar' THEN
+                                'String'
+                            WHEN 'uniqueidentifier' THEN
+                                'Guid'
+                            WHEN 'datetime' THEN
+                                'DateTime'
+                            WHEN 'bit' THEN
+                                'Boolean'
+                            ELSE
+                                'String'
+                        END;
 
-		If (@nullable = 'NO')
-			PRINT '[Required]'
-		if (@sType = 'String' and @maxLen <> '-1')
-			Print '[MaxLength(' +  convert(varchar(4),@maxLen) + ')]'
-		SELECT @sProperty = 'public ' + @sType + ' ' + @columnName + ' { get; set;}'
-		PRINT @sProperty
+        IF (@nullable = 'NO')
+        BEGIN
+            PRINT '[Required]';
+            SET @nullOperator = '';
+        END;
 
-		print ''
-		FETCH NEXT FROM column_cursor INTO @columnName, @nullable, @datatype, @maxlen
-	END
-    CLOSE column_cursor
-    DEALLOCATE column_cursor
 
-	print '}'
-	print ''
-    FETCH NEXT FROM table_cursor 
-    INTO @tableName
-END
-CLOSE table_cursor
-DEALLOCATE table_cursor]]></Code>
+        IF (@sType = 'String' AND @maxlen <> '-1')
+        BEGIN
+            PRINT '[MaxLength(' + CONVERT(VARCHAR(4), @maxlen) + ')]';
+            SET @nullOperator = '?';
+        END;
+
+        SELECT @sProperty = 'public ' + @sType + @nullOperator + ' ' + @columnName + ' { get; set;}';
+        PRINT @sProperty;
+
+        PRINT '';
+        FETCH NEXT FROM column_cursor
+        INTO @columnName,
+             @nullable,
+             @datatype,
+             @maxlen;
+    END;
+    CLOSE column_cursor;
+    DEALLOCATE column_cursor;
+
+    PRINT '}';
+    PRINT '';
+    FETCH NEXT FROM table_cursor
+    INTO @tableName;
+END;
+CLOSE table_cursor;
+DEALLOCATE table_cursor;]]></Code>
     </Snippet>
   </CodeSnippet>
 </CodeSnippets>

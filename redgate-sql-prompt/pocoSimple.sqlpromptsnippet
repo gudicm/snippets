@@ -14,7 +14,7 @@
       <Declarations />
       <Code Language="sql"><![CDATA[declare @tableName varchar(200)
 declare @columnName varchar(200)
-declare @nullable varchar(50)
+declare @nullable varchar(50),@nullOperator VARCHAR(3)
 declare @datatype varchar(50)
 declare @maxlen int
 
@@ -24,7 +24,7 @@ declare @sProperty varchar(200)
 DECLARE table_cursor CURSOR FOR 
 SELECT TABLE_NAME
 FROM [INFORMATION_SCHEMA].[TABLES]
-where table_name like '%tblName%'
+where table_name like '%Users%'
 
 OPEN table_cursor
 
@@ -37,10 +37,10 @@ BEGIN
 PRINT 'public class ' + @tableName + ' {'
 
     DECLARE column_cursor CURSOR FOR 
-    SELECT COLUMN_NAME, IS_NULLABLE, DATA_TYPE, isnull(CHARACTER_MAXIMUM_LENGTH,'-1') 
-  from [INFORMATION_SCHEMA].[COLUMNS] 
+    SELECT COLUMN_NAME, IS_NULLABLE, DATA_TYPE, ISNULL(CHARACTER_MAXIMUM_LENGTH,'-1') 
+  FROM [INFORMATION_SCHEMA].[COLUMNS] 
 	WHERE [TABLE_NAME] = @tableName
-	order by [ORDINAL_POSITION]
+	ORDER BY [ORDINAL_POSITION]
 
     OPEN column_cursor
     FETCH NEXT FROM column_cursor INTO @columnName, @nullable, @datatype, @maxlen
@@ -49,8 +49,8 @@ PRINT 'public class ' + @tableName + ' {'
     BEGIN
 
 	-- datatype
-	select @sType = case @datatype
-	when 'int' then 'int'
+	SELECT @sType = CASE @datatype
+	WHEN 'int' THEN 'int'
 	WHEN 'decimal' THEN 'decimal'
 	WHEN 'money' THEN 'decimal'
 	WHEN 'char' THEN 'string'
@@ -64,11 +64,20 @@ PRINT 'public class ' + @tableName + ' {'
 	END
 
 		IF (@nullable = 'NO')
-			PRINT '[Required]'
-		IF (@sType = 'String' AND @maxLen <> '-1')
-			PRINT '[MaxLength(' +  CONVERT(VARCHAR(4),@maxLen) + ')]'
-		SELECT @sProperty = 'public ' + @sType + ' ' + @columnName + ' { get; set;}'
-		PRINT @sProperty
+        BEGIN
+            PRINT '[Required]';
+            SET @nullOperator = '';
+        END;
+
+
+        IF (@sType = 'String' AND @maxlen <> '-1')
+        BEGIN
+            PRINT '[MaxLength(' + CONVERT(VARCHAR(4), @maxlen) + ')]';
+            SET @nullOperator = '?';
+        END;
+
+        SELECT @sProperty = 'public ' + @sType + @nullOperator + ' ' + @columnName + ' { get; set;}';
+        PRINT @sProperty
 
 		PRINT ''
 		FETCH NEXT FROM column_cursor INTO @columnName, @nullable, @datatype, @maxlen

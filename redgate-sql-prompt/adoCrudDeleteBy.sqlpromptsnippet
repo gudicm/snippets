@@ -1,0 +1,182 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>adoCrudDeleteBy</Title>
+      <Shortcut>adoCrudDeleteBy</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[DECLARE @TableName VARCHAR(50), @Schema VARCHAR(20), @Entity VARCHAR(20), @SelectByColumn NVARCHAR(128), @SelectByNetType NVARCHAR(128), @SelectBysqlDbType NVARCHAR(128)
+DECLARE @Code VARCHAR(8000), @ReaderCode VARCHAR(4000);
+DECLARE @ColumnName VARCHAR(50), @DataType VARCHAR(50), @ConvDataType VARCHAR(50), @Reader VARCHAR(100), @IsNullable VARCHAR(3)
+DECLARE	@RowCount INT, @RowSet INT
+DECLARE	@ToEnd BIT = 0
+DECLARE @TableColumns TABLE (
+RowID INT NOT NULL PRIMARY KEY IDENTITY(1,1),  
+SchemaName VARCHAR(128),
+Table_Name VARCHAR(128),
+Field_Name VARCHAR(128),
+Id_Object INT NOT NULL	,
+Column_Id INT NOT NULL,
+Data_Type VARCHAR(128),
+NetType VARCHAR(128),
+SqlDbType VARCHAR(128),
+Length_Size INT NOT NULL,
+Precision INT,	
+IsNullable BIT
+)
+
+BEGIN
+
+SET @TableName = 'Users'
+SET @Schema = 'dbo'
+SET @Entity = 'User'
+SET @SelectByColumn = 'Id'
+
+INSERT INTO @TableColumns
+(
+    SchemaName,
+    Table_Name,
+    Field_Name,
+    Id_Object,
+    Column_Id,
+    Data_Type,
+	NetType,
+	SqlDbType,
+    Length_Size,
+    Precision,
+	IsNullable
+)
+SELECT CAST(OBJECT_SCHEMA_NAME(c.object_id) AS NVARCHAR(128)) SchemaName,
+       CAST(o.name AS NVARCHAR(128)) AS Table_Name,
+       CAST(c.name AS NVARCHAR(128)) AS Field_Name,
+       o.object_id AS Id_Object,
+       c.column_id AS Column_Id,
+       CAST(t.name AS NVARCHAR(128)) AS Data_Type,
+	   CASE 
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'bigint' THEN 'Int64'
+			WHEN CAST(t.name AS NVARCHAR(128))= 'binary' THEN 'Binary'
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'bit' THEN 'Boolean'
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'char' THEN 'Char'
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'datetime' THEN 'DateTime'
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'datetime2' THEN 'DateTime'
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'decimal' THEN 'Decimal'	
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'float' THEN 'Double'	
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'int' THEN 'Int32'	
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'money' THEN 'Decimal'
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'numeric' THEN 'Decimal'
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'nvarchar' THEN 'String'
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'numeric' THEN 'Decimal'
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'varchar' THEN 'String'
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'xml' THEN 'Xml'
+			ELSE 'Object'																																	
+	   END  AS NetType,
+	   CASE
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'bigint' THEN 'BigInt'
+			WHEN CAST(t.name AS NVARCHAR(128))= 'binary' THEN 'VarBinary'
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'bit' THEN 'Bit'
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'char' THEN 'Char'
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'datetime' THEN 'Date'
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'datetime2' THEN 'DateTime'
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'decimal' THEN 'Decimal'	
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'float' THEN 'Float'	
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'int' THEN 'Int'	
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'money' THEN 'Money'
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'numeric' THEN 'Decimal'
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'nvarchar' THEN 'NVarChar'
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'numeric' THEN 'Decimal'
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'varchar' THEN 'VarChar'
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'xml' THEN 'Xml'
+			ELSE 'Object'												
+	   END AS SqlDbType,
+	   t.max_length AS Length_Size,
+       t.precision AS Precision,
+	   c.is_nullable AS IsNullable
+FROM sys.columns c
+    INNER JOIN sys.objects o
+        ON o.object_id = c.object_id
+    LEFT JOIN sys.types t
+        ON t.user_type_id = c.user_type_id
+WHERE o.type = 'U'
+      AND o.name = @TableName
+      AND OBJECT_SCHEMA_NAME(c.object_id) = @Schema;
+
+SELECT * FROM @TableColumns
+SET @RowSet = @@ROWCOUNT
+
+IF(@RowSet = 0)
+
+BEGIN
+	GOTO noTableFound 
+
+END;	
+
+
+SELECT @SelectByColumn = Field_Name, 
+@SelectByNetType = NetType,
+@SelectBysqlDbType = SqlDbType
+FROM @TableColumns WHERE Field_Name = @SelectByColumn
+
+IF(@SelectByColumn IS NULL OR @SelectByColumn = '')
+BEGIN
+	SET @ToEnd = 1
+	GOTO noColumnFound
+END;
+
+SET @RowCount = 1
+WHILE (@RowCount <= @RowSet)
+BEGIN
+
+	SET @RowCount = @RowCount +1 	 
+END
+
+SET @Code = CONCAT(
+	'// GENERATED CODE',CHAR(13),
+	'public int Delete',@TableName,'By',@SelectByColumn,'(string connStr, int ',LOWER(@SelectByColumn),')',CHAR(13),
+	'{', CHAR(13),
+	 CHAR(9),'var sql = ','$"','DELETE FROM ',@TableName,' WHERE ',@SelectByColumn,'=@',LOWER(@SelectByColumn),'";',CHAR(13),
+	CHAR(9),'using (var conn = new SqlConnection(connStr))',CHAR(13),	
+	CHAR(9),'using (var cmd = new SqlCommand(sql, conn))',CHAR(13),
+    CHAR(9),'{', CHAR(13),
+	CHAR(9),CHAR(9),'conn.Open();',CHAR(13),
+	CHAR(9),CHAR(9),'cmd.Parameters.Add("@',@SelectByColumn,'", SqlDbType.',@SelectBysqlDbType,').Value = ',LOWER(@SelectByColumn),';',CHAR(13),	
+	CHAR(9),CHAR(9),'return cmd.ExecuteNonQuery();',CHAR(13),
+	  CHAR(9),'}', CHAR(13),
+	'}', CHAR(13),
+	'// GENERATED CODE',CHAR(13)
+)
+
+SELECT @Code
+PRINT @Code
+
+END
+
+noColumnFound:
+	BEGIN
+		IF @ToEnd = 1
+			SELECT 'Delete by Column '+ @SelectByColumn + 'not found in table ' + @TableName
+		GOTO endBlock
+	END
+	
+noTableFound:
+	BEGIN
+		IF @ToEnd = 1
+			SELECT 'Table with name ' + @Schema + '.' + @TableName ' not found'
+		GOTO endBlock
+	END;
+
+
+
+endBlock:
+	IF @ToEnd = 1
+	SELECT 'End of statement'
+]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

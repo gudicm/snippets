@@ -1,0 +1,154 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>adoCrudInsert</Title>
+      <Shortcut>adoCrudInsert</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[
+DECLARE @TableName VARCHAR(50), @Schema VARCHAR(20), @Entity VARCHAR(20)
+DECLARE @Code VARCHAR(8000), @ParamsInsert VARCHAR(1000), @ValuesInsert VARCHAR(1000), @SqlParams VARCHAR(3000);
+DECLARE @ColumnName VARCHAR(50), @DataType VARCHAR(50), @ConvDataType VARCHAR(50),  @IsNullable VARCHAR(3)
+DECLARE	@RowCount INT, @RowSet INT
+DECLARE	@ToEnd BIT = 0
+DECLARE @TableColumns TABLE (
+RowID INT NOT NULL PRIMARY KEY IDENTITY(1,1),  
+SchemaName VARCHAR(128),
+Table_Name VARCHAR(128),
+Field_Name VARCHAR(128),
+Id_Object INT NOT NULL	,
+Column_Id INT NOT NULL,
+Data_Type VARCHAR(128),
+SqlDataType VARCHAR(128),
+Length_Size INT NOT NULL,
+Precision INT,	
+IsNullable BIT
+)
+
+BEGIN
+
+SET @TableName = 'Users'
+SET @Schema = 'dbo'
+SET @Entity = 'User'
+
+
+
+
+INSERT INTO @TableColumns
+(
+    SchemaName,
+    Table_Name,
+    Field_Name,
+    Id_Object,
+    Column_Id,
+    Data_Type,
+	SqlDataType,
+    Length_Size,
+    Precision,
+	IsNullable
+)
+SELECT CAST(OBJECT_SCHEMA_NAME(c.object_id) AS NVARCHAR(128)) SchemaName,
+       CAST(o.name AS NVARCHAR(128)) AS Table_Name,
+       CAST(c.name AS NVARCHAR(128)) AS Field_Name,
+       o.object_id AS Id_Object,
+       c.column_id AS Column_Id,
+       CAST(t.name AS NVARCHAR(128)) AS Data_Type,
+	   CASE 
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'bigint' THEN 'BigInt'
+			WHEN CAST(t.name AS NVARCHAR(128))= 'binary' THEN 'VarBinary'
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'bit' THEN 'Bit'
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'char' THEN 'Date'
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'datetime' THEN 'DateTime'
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'datetime2' THEN 'DateTime2'
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'decimal' THEN 'Decimal'	
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'float' THEN 'Double'	
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'int' THEN 'Int'	
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'money' THEN 'Money'
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'numeric' THEN 'Decimal'
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'nvarchar' THEN 'NVarChar'
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'numeric' THEN 'Decimal'
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'varchar' THEN 'VarChar'
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'xml' THEN 'Xml'
+			ELSE 'Object'																																	
+	   END  AS SqlDataType,
+	   t.max_length AS Length_Size,
+       t.precision AS Precision,
+	   c.is_nullable AS IsNullable
+FROM sys.columns c
+    INNER JOIN sys.objects o
+        ON o.object_id = c.object_id
+    LEFT JOIN sys.types t
+        ON t.user_type_id = c.user_type_id
+WHERE o.type = 'U'
+      AND o.name = @TableName
+      AND OBJECT_SCHEMA_NAME(c.object_id) = @Schema;
+
+SET @RowSet = @@ROWCOUNT
+
+SELECT * FROM @TableColumns
+
+IF(@RowSet = 0)
+BEGIN
+	SET @ToEnd = 1
+    GOTO endBlock
+
+END;	
+
+SET @RowCount = 1
+WHILE (@RowCount <= @RowSet)
+BEGIN
+	
+	SELECT @ColumnName=Field_Name,
+	@DataType = SqlDataType	             
+	FROM @TableColumns 
+	WHERE RowID = @RowCount
+
+	IF(@RowCount<@RowSet)
+		SELECT @ParamsInsert = CONCAT(@ParamsInsert, @ColumnName,', '), @ValuesInsert = CONCAT(@ValuesInsert,'@',@ColumnName,', ')
+	ELSE	
+		SELECT @ParamsInsert = CONCAT(@ParamsInsert, @ColumnName), @ValuesInsert = CONCAT(@ValuesInsert,'@',@ColumnName)
+	
+	SELECT @SqlParams = CONCAT(@SqlParams,
+							   CHAR(9),CHAR(9),'cmd.Parameters.Add("@',@ColumnName,'", SqlDbType.',@DataType,').Value = ',LOWER(@Entity) ,'.',@ColumnName ,';',	
+							   CHAR(13)
+							  )
+	SET @RowCount = @RowCount +1 	 
+END
+
+
+SET @Code = CONCAT(
+	'public int Insert',@Entity,'(string connStr, ',@Entity,' ',LOWER(@Entity) ,')',CHAR(13),
+	'{', CHAR(13),
+	 CHAR(9),'var sql = ','$"','INSERT INTO ', @Schema,'.',@TableName,' (',@ParamsInsert,') VALUES (',@ValuesInsert,')";',CHAR(13),
+	CHAR(9),'using (var conn = new SqlConnection(connStr))',CHAR(13),	
+	CHAR(9),'using (var cmd = new SqlCommand(sql, conn))',CHAR(13),
+    CHAR(9),'{', CHAR(13),
+	CHAR(9),CHAR(9),'conn.Open();',CHAR(13),
+	@SqlParams,
+	CHAR(9),CHAR(9),'return cmd.ExecuteNonQuery();',CHAR(13),
+	
+	CHAR(9),'};', CHAR(13),
+    '}'
+)
+
+SELECT @Code
+PRINT @Code
+
+endBlock:
+	IF(@ToEnd = 1)
+		SELECT 'Table with name ' + @Schema + '.' + @TableName ' not found'
+
+END;
+
+
+]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

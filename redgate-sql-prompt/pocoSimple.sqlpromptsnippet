@@ -76,7 +76,7 @@ PRINT 'public class ' + @tableName + ' {'
             SET @nullOperator = '?';
         END;
 
-        SELECT @sProperty = 'public ' + @sType + @nullOperator + ' ' + @columnName + ' { get; set;}';
+        SELECT @sProperty = 'public ' + @sType + @nullOperator + ' ' + UPPER(LEFT(@columnName,1))+LOWER(SUBSTRING(@columnName,2,LEN(@columnName))) + ' { get; set;}';
         PRINT @sProperty
 
 		PRINT ''

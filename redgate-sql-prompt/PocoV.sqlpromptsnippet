@@ -68,7 +68,7 @@ PRINT 'public class ' + @tableName + ' {'
 			PRINT '[Required]'
 		if (@sType = 'String' and @maxLen <> '-1')
 			Print '[MaxLength(' +  convert(varchar(4),@maxLen) + ')]'
-		SELECT @sProperty = 'public ' + @sType + ' ' + @columnName + ' { get; set;}'
+		SELECT @sProperty = 'public ' + @sType + ' ' + UPPER(LEFT(@columnName ,1))+LOWER(SUBSTRING(@columnName ,2,LEN(@columnName))) + ' { get; set;}'
 		PRINT @sProperty
 
 		print ''

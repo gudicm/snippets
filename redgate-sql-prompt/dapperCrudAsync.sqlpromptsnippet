@@ -1,0 +1,236 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>dapperCrudAsync</Title>
+      <Shortcut>dapperCrudAsync</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[
+DECLARE @TableName VARCHAR(50), @Schema VARCHAR(20), @Entity VARCHAR(20)
+DECLARE @Code VARCHAR(8000), @InsertSql VARCHAR(1000), @InsertVals VARCHAR(1000), @UpdateVals VARCHAR(1000);
+DECLARE @ColumnName VARCHAR(50), @DataType VARCHAR(50), @ConvDataType VARCHAR(50), @Reader VARCHAR(100), @IsNullable VARCHAR(3)
+DECLARE	@RowCount INT, @RowSet INT
+DECLARE	@ToEnd BIT = 0
+DECLARE @TableColumns TABLE (
+RowID INT NOT NULL PRIMARY KEY IDENTITY(1,1),  
+SchemaName VARCHAR(128),
+Table_Name VARCHAR(128),
+Field_Name VARCHAR(128),
+Id_Object INT NOT NULL	,
+Column_Id INT NOT NULL,
+Data_Type VARCHAR(128),
+SqlDataType VARCHAR(128),
+Length_Size INT NOT NULL,
+Precision INT,	
+IsNullable BIT
+)
+
+BEGIN
+
+SET @TableName = 'Users'
+SET @Schema = 'dbo'
+SET @Entity = 'User'
+
+
+INSERT INTO @TableColumns
+(
+    SchemaName,
+    Table_Name,
+    Field_Name,
+    Id_Object,
+    Column_Id,
+    Data_Type,
+	SqlDataType,
+    Length_Size,
+    Precision,
+	IsNullable
+)
+SELECT CAST(OBJECT_SCHEMA_NAME(c.object_id) AS NVARCHAR(128)) SchemaName,
+       CAST(o.name AS NVARCHAR(128)) AS Table_Name,
+       CAST(c.name AS NVARCHAR(128)) AS Field_Name,
+       o.object_id AS Id_Object,
+       c.column_id AS Column_Id,
+       CAST(t.name AS NVARCHAR(128)) AS Data_Type,
+	   CASE 
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'bigint' THEN 'Int64'
+			WHEN CAST(t.name AS NVARCHAR(128))= 'binary' THEN 'Binary'
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'bit' THEN 'Boolean'
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'char' THEN 'Char'
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'datetime' THEN 'DateTime'
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'datetime2' THEN 'DateTime'
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'decimal' THEN 'Decimal'	
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'float' THEN 'Double'	
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'int' THEN 'Int32'	
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'money' THEN 'Decimal'
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'numeric' THEN 'Decimal'
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'nvarchar' THEN 'String'
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'numeric' THEN 'Decimal'
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'varchar' THEN 'String'
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'xml' THEN 'Xml'
+			ELSE 'Object'																																	
+	   END  AS SqlDataType,
+	   t.max_length AS Length_Size,
+       t.precision AS Precision,
+	   c.is_nullable AS IsNullable
+FROM sys.columns c
+    INNER JOIN sys.objects o
+        ON o.object_id = c.object_id
+    LEFT JOIN sys.types t
+        ON t.user_type_id = c.user_type_id
+WHERE o.type = 'U'
+      AND o.name = @TableName
+      AND OBJECT_SCHEMA_NAME(c.object_id) = @Schema;
+
+SET @RowSet = @@ROWCOUNT
+
+SELECT * FROM @TableColumns
+
+IF(@RowSet = 0)
+BEGIN
+	SET @ToEnd = 1
+    GOTO endBlock
+
+END;	
+
+
+
+SET @RowCount = 1
+WHILE (@RowCount <= @RowSet)
+BEGIN
+	SELECT @ColumnName = Field_Name,
+	@DataType = Data_Type
+			 
+	FROM @TableColumns WHERE RowID = @RowCount
+	IF(@RowCount<@RowSet)
+	BEGIN
+	    
+		IF @DataType = 'varchar'
+			
+			BEGIN
+			    SELECT @InsertSql = CONCAT(@InsertSql,UPPER(LEFT(@columnName,1))+LOWER(SUBSTRING(@columnName,2,LEN(@columnName))),','), @InsertVals =CONCAT(@InsertVals,'{t.',CHAR(39),UPPER(LEFT(@columnName,1))+LOWER(SUBSTRING(@columnName,2,LEN(@columnName))),'},',CHAR(39))
+				SELECT @UpdateVals= CONCAT(@UpdateVals,UPPER(LEFT(@ColumnName, 1)) + LOWER(SUBSTRING(@ColumnName, 2, LEN(@ColumnName))),'=''{t.',UPPER(LEFT(@ColumnName, 1)) + LOWER(SUBSTRING(@ColumnName, 2, LEN(@ColumnName))),'}'',')
+			END;
+			
+		ELSE
+			BEGIN
+			    SELECT @InsertSql = CONCAT(@InsertSql,UPPER(LEFT(@columnName,1))+LOWER(SUBSTRING(@columnName,2,LEN(@columnName))),','), @InsertVals =CONCAT(@InsertVals,'{t.',CHAR(39),UPPER(LEFT(@columnName,1))+LOWER(SUBSTRING(@columnName,2,LEN(@columnName))),'},',CHAR(39)) 
+				SELECT @UpdateVals= CONCAT(@UpdateVals,UPPER(LEFT(@ColumnName, 1)) + LOWER(SUBSTRING(@ColumnName, 2, LEN(@ColumnName))),'={t.',UPPER(LEFT(@ColumnName, 1)) + LOWER(SUBSTRING(@ColumnName, 2, LEN(@ColumnName))),'},')	 
+			END;
+		END;
+	ELSE
+	BEGIN
+	    
+		IF @DataType = 'varchar'
+		BEGIN
+			SELECT @InsertSql = CONCAT(@InsertSql,UPPER(LEFT(@columnName,1))+LOWER(SUBSTRING(@columnName,2,LEN(@columnName))),','), @InsertVals =CONCAT(@InsertVals,'{t.',UPPER(LEFT(@columnName,1))+LOWER(SUBSTRING(@columnName,2,LEN(@columnName))),'}')
+			SELECT @UpdateVals= CONCAT(@UpdateVals,UPPER(LEFT(@ColumnName, 1)) + LOWER(SUBSTRING(@ColumnName, 2, LEN(@ColumnName))),'=''{t.',UPPER(LEFT(@ColumnName, 1)) + LOWER(SUBSTRING(@ColumnName, 2, LEN(@ColumnName))),'}''')
+		END;
+		ELSE
+		BEGIN
+		    SELECT @InsertSql = CONCAT(@InsertSql,UPPER(LEFT(@columnName,1))+LOWER(SUBSTRING(@columnName,2,LEN(@columnName))),','), @InsertVals =CONCAT(@InsertVals,'{t.',UPPER(LEFT(@columnName,1))+LOWER(SUBSTRING(@columnName,2,LEN(@columnName))),'}') 
+			SELECT @UpdateVals= CONCAT(@UpdateVals,UPPER(LEFT(@ColumnName, 1)) + LOWER(SUBSTRING(@ColumnName, 2, LEN(@ColumnName))),'={t.',UPPER(LEFT(@ColumnName, 1)) + LOWER(SUBSTRING(@ColumnName, 2, LEN(@ColumnName))),'}')
+		END;
+			
+	END;	
+	SET @RowCount = @RowCount +1 	 
+END
+
+
+
+
+
+SELECT @InsertSql  = CONCAT('INSERT INTO ',@Schema,'.',@TableName,'(',@InsertSql,')',' VALUES(',@InsertVals,')')
+SELECT @UpdateVals = CONCAT('UPDATE ',@Schema,'.',@TableName, ' SET ', @UpdateVals)
+
+SET @Code = CONCAT(
+	'// GENERATED CODE', CHAR(13),
+	'public class ',@Entity,'Repository',CHAR(13),
+	'{', CHAR(13),
+	CHAR(9), 'private string _connStr;', CHAR(13),
+	CHAR(9), 'IDbConnection _conn;', CHAR(13),
+	CHAR(9), 'public ',@Entity,'Repository(string  connStr)',CHAR(13),
+    CHAR(9),'{',CHAR(13),
+	CHAR(9),CHAR(9),'_connStr = connStr;',CHAR(13),
+	CHAR(9),CHAR(9),'_conn = CreateConnection();',CHAR(13),
+	CHAR(9),'}',CHAR(13),        
+    CHAR(13),   
+	CHAR(9),'private SqlConnection SqlConnection()',CHAR(13),
+	CHAR(9),'{', CHAR(13),
+	CHAR(9),CHAR(9), ' return new SqlConnection(_connStr);',CHAR(13),
+	CHAR(9),'}', CHAR(13),
+	CHAR(13),
+	CHAR(9),'private SqlConnection CreateConnection()',CHAR(13),
+	CHAR(9),'{', CHAR(13),
+	CHAR(9),CHAR(9),'var conn = SqlConnection();',CHAR(13),
+	CHAR(9),CHAR(9),'conn.Open();', CHAR(13),
+    CHAR(9),CHAR(9),'return conn;',CHAR(13),        
+	CHAR(9),'}', CHAR(13),
+	CHAR(13),
+	CHAR(9),'public async Task<IEnumerable<',@Entity,'>> GetAllAsync()',CHAR(13),
+	CHAR(9),'{', CHAR(13),
+	CHAR(9),CHAR(9),'return await _conn.QueryAsync<',@Entity,'>(@"SELECT * FROM ',@Schema,'.',@TableName,'").ConfigureAwait(false);',CHAR(13),
+	CHAR(9),'}', CHAR(13),
+	CHAR(13),
+	CHAR(9),'public async Task<',@Entity,'> GetAsync(int id)',CHAR(13),
+	CHAR(9),'{', CHAR(13),
+	CHAR(9),CHAR(9),'var result = await _conn.QuerySingleOrDefaultAsync<',@Entity,'>($"SELECT * FROM ',@Schema,'.',@TableName,' WHERE Id=@Id", new { Id = id });',CHAR(13),
+    CHAR(9),CHAR(9), 'if (result == null)', CHAR(13), 
+	CHAR(9),CHAR(9),CHAR(9),'throw new KeyNotFoundException($"',@Entity,' with id [{id}] could not be found.");', CHAR(13), 
+	CHAR(13),
+	CHAR(9),CHAR(9), 'return result;',CHAR(13),
+	CHAR(9),'}', CHAR(13),
+	CHAR(13),
+	CHAR(9),'public async Task<int> DeleteRowAsync(int id)',CHAR(13),
+	CHAR(9),'{', CHAR(13),
+	CHAR(9),CHAR(9),'var result = await _conn.ExecuteAsync($"DELETE FROM ',@Schema,'.',@TableName,' WHERE Id=@Id", new { Id = id });',CHAR(13),
+    CHAR(9),CHAR(9), 'if (result == 1)', CHAR(13), 
+	CHAR(9),CHAR(9),CHAR(9),'throw new KeyNotFoundException($"',@Entity,' with id [{id}] could not be found.");', CHAR(13), 
+	CHAR(13),
+	CHAR(9),CHAR(9), 'return result;',CHAR(13),
+	CHAR(9),'}', CHAR(13),
+	CHAR(13),		
+	CHAR(9),'public async Task<int> InsertAsync(',@Entity,' t)',CHAR(13),
+	CHAR(9),'{', CHAR(13),
+	CHAR(9),CHAR(9),'string sql = $"' + @InsertSql + '";', CHAR(13),
+	CHAR(9),CHAR(9),'var result = await _conn.ExecuteAsync(sql);',CHAR(13),
+    CHAR(9),CHAR(9), 'if (result == 1)', CHAR(13), 
+	CHAR(9),CHAR(9),CHAR(9),'throw new Exception("New ',@Entity,' record not inserted!");', CHAR(13), 
+	CHAR(13),
+	CHAR(9),CHAR(9), 'return result;',CHAR(13),
+    CHAR(9),'}', CHAR(13),
+	CHAR(13),	
+	CHAR(9),'public async Task<int> UpdateAsync(',@Entity,' t)',CHAR(13),
+	CHAR(9),'{', CHAR(13),
+	CHAR(9),CHAR(9),'string sql = $"',@UpdateVals,'";', CHAR(13),
+	CHAR(9),CHAR(9),'var result = await _conn.ExecuteAsync(sql);',CHAR(13),
+    CHAR(9),CHAR(9), 'if (result == 1)', CHAR(13), 
+	CHAR(9),CHAR(9),CHAR(9),'throw new Exception($"',@Entity,' with id [{t.Id}]  not be updated.");', CHAR(13), 
+	CHAR(13),
+	CHAR(9),CHAR(9), 'return result;',CHAR(13),
+    CHAR(9),'}', CHAR(13),
+	CHAR(13),		 		
+	'}', CHAR(13),
+	'// GENERATED CODE', CHAR(13)
+)
+
+SELECT @Code
+PRINT @Code
+
+endBlock:
+	IF(@ToEnd = 1)
+		SELECT 'Table with name ' + @Schema + '.' + @TableName ' not found'
+
+END;
+
+
+]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

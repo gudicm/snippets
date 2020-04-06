@@ -1,0 +1,15 @@
+  docker version
+  docker --version
+  clear
+  
+  docker run hello-world						# docker run <image name>
+  docker pull ubuntu							# docker pull   <image name>
+  docker run -it -d ubuntu  					# run in interactive mode
+  docker list
+  docker container ls							# list running containers 
+  docker ps -a									# list all images with assiacte container's ids
+  docker container prune						# remove all stopped containers
+  docker exec -it cba5232b0479 bash				# attach to bash shell of container identified by id
+  docker stop cba5232b0479
+  
+  docker-compose

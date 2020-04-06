@@ -4,7 +4,7 @@
     <Header>
       <Title>Poco</Title>
       <Shortcut>Poco</Shortcut>
-      <Description>poco class generator from table object</Description>
+      <Description>model class generator from table object</Description>
       <Author />
       <SnippetTypes>
         <SnippetType>Expansion</SnippetType>

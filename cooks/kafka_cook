@@ -1,0 +1,18 @@
+cdc(change data capture) sql server
+
+kafka platforms
+- confluent(platform)
+- pulsar
+
+Use case(phase 1)
+Transferring tables from 3 db to new back-office system, using CDC and Kafka connect API.
+
+- CDC monitor all transaction log on repository source when change event happens it notifies kafka server.
+- using Kafka Connect REST it take the change from source and deliver it to back-office db. 
+ 	
+Steps:
+1. connect to dev env.
+2. check the pluralsight course. 
+ 
+
+

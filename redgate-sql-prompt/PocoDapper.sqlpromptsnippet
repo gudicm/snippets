@@ -1,0 +1,155 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>PocoDapper</Title>
+      <Shortcut>PocoDapper</Shortcut>
+      <Description>model class generator for dapper with annotations </Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[DECLARE @TableName VARCHAR(50), @Schema VARCHAR(20), @Entity VARCHAR(20)
+DECLARE @Code VARCHAR(8000), @Props VARCHAR(2000);
+DECLARE @ColumnName VARCHAR(50), @DataType VARCHAR(50), @Key VARCHAR(20), @Computed VARCHAR(500)
+DECLARE	@RowCount INT, @RowSet INT
+DECLARE	@ToEnd BIT = 0
+DECLARE @TableColumns TABLE (
+RowID INT NOT NULL PRIMARY KEY IDENTITY(1,1),  
+SchemaName VARCHAR(128),
+Table_Name VARCHAR(128),
+Field_Name VARCHAR(128),
+Id_Object INT NOT NULL	,
+Column_Id INT NOT NULL,
+Data_Type VARCHAR(128),
+SqlDataType VARCHAR(128),
+Length_Size INT NOT NULL,
+Precision INT,	
+IsNullable BIT,
+IsComputed BIT,
+IsIdentity BIT	
+)
+
+BEGIN
+
+SET @TableName = 'Cases'
+SET @Schema = 'dbo'
+SET @Entity = 'case'
+
+-- format input values
+SELECT @Entity = UPPER(LEFT(@Entity,1))+LOWER(SUBSTRING(@Entity,2,LEN(@Entity))),
+@TableName = UPPER(LEFT(@TableName,1))+LOWER(SUBSTRING(@TableName,2,LEN(@TableName)))
+
+
+
+INSERT INTO @TableColumns
+(
+    SchemaName,
+    Table_Name,
+    Field_Name,
+    Id_Object,
+    Column_Id,
+    Data_Type,
+	SqlDataType,
+    Length_Size,
+    Precision,
+	IsNullable,
+	IsComputed,
+	IsIdentity
+)
+SELECT CAST(OBJECT_SCHEMA_NAME(c.object_id) AS NVARCHAR(128)) SchemaName,
+       CAST(o.name AS NVARCHAR(128)) AS Table_Name,
+       CAST(c.name AS NVARCHAR(128)) AS Field_Name,
+       o.object_id AS Id_Object,
+       c.column_id AS Column_Id,
+       CAST(t.name AS NVARCHAR(128)) AS Data_Type,
+	   CASE 
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'bigint' THEN 'Int64'
+			WHEN CAST(t.name AS NVARCHAR(128))= 'binary' THEN 'Binary'
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'bit' THEN 'Boolean'
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'nchar' THEN 'string'
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'char' THEN 'char'
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'datetime' THEN 'DateTime'
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'datetime2' THEN 'DateTime'
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'decimal' THEN 'decimal'	
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'float' THEN 'double'	
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'int' THEN 'int'	
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'money' THEN 'decimal'
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'numeric' THEN 'decimal'
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'nvarchar' THEN 'string'
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'numeric' THEN 'decimal'
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'varchar' THEN 'string'
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'xml' THEN 'Xml'
+			ELSE 'Object'																																	
+	   END  AS SqlDataType,
+	   t.max_length AS Length_Size,
+       t.precision AS Precision,
+	   c.is_nullable AS IsNullable,
+	   c.is_computed AS IsComputed,
+	   c.is_identity AS IsIdentity
+FROM sys.columns c
+    INNER JOIN sys.objects o
+        ON o.object_id = c.object_id
+    LEFT JOIN sys.types t
+        ON t.user_type_id = c.user_type_id
+WHERE o.type = 'U'
+      AND o.name = @TableName
+      AND OBJECT_SCHEMA_NAME(c.object_id) = @Schema;
+
+
+SET @RowSet = @@ROWCOUNT
+
+SELECT * FROM @TableColumns
+
+IF(@RowSet = 0)
+BEGIN
+	SET @ToEnd = 1
+    GOTO endBlock
+
+END;
+
+SET @RowCount = 1
+WHILE (@RowCount <= @RowSet)
+BEGIN
+	
+	SELECT @ColumnName = Field_Name,
+	@DataType = SqlDataType,
+	@Computed = CASE
+				WHEN IsComputed = 1 THEN CONCAT(
+												CHAR(9), '[Write(false)]',CHAR(13),
+												CHAR(9), '[Computed]',CHAR(13)
+												) 	
+				ELSE	''
+				END
+	FROM @TableColumns WHERE RowID = @RowCount
+
+	SELECT @Props = CONCAT(@Props,
+		@Computed,
+		CHAR(9),'public ',@DataType,' ',UPPER(LEFT(@ColumnName,1))+LOWER(SUBSTRING(@ColumnName,2,LEN(@ColumnName))), ' { get; set; }',CHAR(13)
+	)
+	SET @RowCount = @RowCount +1 	 
+END
+
+SET @Code = CONCAT(
+'// generated code', CHAR(13),
+'[Table("',UPPER(@Schema),'.',@TableName,'")]', CHAR(13),
+'public class ',@Entity, CHAR(13),
+'{',CHAR(13),
+@Props,
+'}',CHAR(13),
+'// end of generated code', CHAR(13)
+)
+
+SELECT @Code
+PRINT @Code
+
+endBlock:
+	IF(@ToEnd = 1)
+		SELECT 'Table with name ' + @Schema + '.' + @TableName ' not found'
+END;]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

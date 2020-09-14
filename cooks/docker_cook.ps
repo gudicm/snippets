@@ -2,14 +2,81 @@
   docker --version
   clear
   
-  docker run hello-world						# docker run <image name>
-  docker pull ubuntu							# docker pull   <image name>
-  docker run -it -d ubuntu  					# run in interactive mode
+  docker run hello-world						% docker run <image name>
+  docker pull ubuntu							% docker pull   <image name>
+  docker run -it -d ubuntu  					% run in interactive mode
   docker list
-  docker container ls							# list running containers 
-  docker ps -a									# list all images with assiacte container's ids
-  docker container prune						# remove all stopped containers
-  docker exec -it cba5232b0479 bash				# attach to bash shell of container identified by id
+  docker container ls							% list running containers 
+  docker ps -a									% list all images with assiacte container's ids
+  docker container prune						% remove all stopped containers
+  docker exec -it cba5232b0479 bash				% attach to bash shell of container identified by id
   docker stop cba5232b0479
+  docker commmit                                % creates a new image from docker's container
   
-  docker-compose
+  docker system prune                           % removes all images
+  docker system prune -a --volumes
+  
+  % flags
+  -it interactive mode
+  -d  enable debug     
+  
+  % docker commands
+  docker build .        % runs docker image defined in current Dockerfile
+  docker pull "image-name-in-docker-hub-repo"
+  docker build -t aspnetapp . % build docker out of image (execute cmd from path where docker file resides) // docker build -t <image_name> .
+  docker run -it --rm -p 5000:80 --name aspnetcore_sample aspnetapp % maps port 80 to 5000 add a name to image process(container)
+  docker run -it --rm -p 53930:80 44370:443 --name aspnetcore-binded aspnetapp:gudicm % maps port 80 to 5000 add a name to image process(container)
+  
+  
+  % example to start container and to run command
+  $ docker run --name ubuntu_bash --rm -it ubuntu bash
+  $ docker exec -d ubuntu_bash touch /tmp/execWorks
+  $ docker exec -it mssql_sqldata_1 bash
+  
+  
+  docker exec aspnetapp ipconfig  % exec <docker-name or docker-id> command                  
+  dotnet publish -c Release -o published
+  docker container stop $(docker container list -q) % stop all container
+  docker system prune                               % deletes all containers and resources assign to containers 
+  docker system prune -a --volumes                                                  
+  docker build -f MyDockerfile .
+  
+  docker build -f Dockerfile.prod -t aspnetapp-prod.
+  
+  
+  
+  docker-compose -f docker-compose.yml -f docker-compose-test.override.yml up -d ./run_unit_tests % with override for running a tunit tests
+  docker-compose -f docker-compose-tests.yml -f docker-compose-tests.override.yml up -d 
+  % .env file can be used to store env variables
+  
+  % docker commands
+  
+  %  tool for defining and running complex applications with Docker
+  
+  docker-compose build %  building docker image
+  docker-compose scale SERVICE=3  %   scaling a container running a given service      
+  docker-compose up --no-recreate %   running a container that have been stopped 
+  docker-compose up -d --force-recreate % running a container with force recreate
+  
+  docker-compose -f "src\docker-compose-tests.yml" up -d --build % compose specific yml file 
+
+  % building a image with .dockerfile
+  docker build -t aspnet-dev .
+
+
+  % Dockerfile construction
+  
+  % use existing image as docker base
+  % download a dependencies
+  % tell the image what to do when it starts as image
+  
+  % when changing a docker file put all changes sequenceally due, docker image is cached and changing sequence of command can dramatically 
+  % change build time of container  
+  
+  
+  % Dockerfile construction
+
+  % docker-compose
+  % services - type of container
+  % url addressing by container name(not host name ) within docker-compose
+  % docker-compose

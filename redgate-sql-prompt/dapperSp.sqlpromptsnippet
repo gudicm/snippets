@@ -4,7 +4,7 @@
     <Header>
       <Title>dapperSp</Title>
       <Shortcut>dapperSp</Shortcut>
-      <Description>dapper generator for calling peoc</Description>
+      <Description>generate c# proc call with dapper ORM</Description>
       <Author />
       <SnippetTypes>
         <SnippetType>Expansion</SnippetType>

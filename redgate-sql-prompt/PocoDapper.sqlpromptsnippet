@@ -14,7 +14,7 @@
       <Declarations />
       <Code Language="sql"><![CDATA[DECLARE @TableName VARCHAR(50), @Schema VARCHAR(20), @Entity VARCHAR(20)
 DECLARE @Code VARCHAR(8000), @Props VARCHAR(2000);
-DECLARE @ColumnName VARCHAR(50), @DataType VARCHAR(50), @Key VARCHAR(20), @Computed VARCHAR(500)
+DECLARE @ColumnName VARCHAR(50), @DataType VARCHAR(50), @Key VARCHAR(50), @Computed VARCHAR(500)
 DECLARE	@RowCount INT, @RowSet INT
 DECLARE	@ToEnd BIT = 0
 DECLARE @TableColumns TABLE (
@@ -30,14 +30,15 @@ Length_Size INT NOT NULL,
 Precision INT,	
 IsNullable BIT,
 IsComputed BIT,
-IsIdentity BIT	
+IsIdentity BIT,
+IsPkIdentity BIT	
 )
 
 BEGIN
 
-SET @TableName = 'Cases'
-SET @Schema = 'dbo'
-SET @Entity = 'case'
+SET @TableName =  $<table_name>$ 
+SET @Schema = $<_schema_name>$
+SET @Entity = $<class_name>$
 
 -- format input values
 SELECT @Entity = UPPER(LEFT(@Entity,1))+LOWER(SUBSTRING(@Entity,2,LEN(@Entity))),
@@ -58,7 +59,8 @@ INSERT INTO @TableColumns
     Precision,
 	IsNullable,
 	IsComputed,
-	IsIdentity
+	IsIdentity,
+	IsPkIdentity
 )
 SELECT CAST(OBJECT_SCHEMA_NAME(c.object_id) AS NVARCHAR(128)) SchemaName,
        CAST(o.name AS NVARCHAR(128)) AS Table_Name,
@@ -89,12 +91,29 @@ SELECT CAST(OBJECT_SCHEMA_NAME(c.object_id) AS NVARCHAR(128)) SchemaName,
        t.precision AS Precision,
 	   c.is_nullable AS IsNullable,
 	   c.is_computed AS IsComputed,
-	   c.is_identity AS IsIdentity
+	   c.is_identity AS IsIdentity,
+	   ISNULL(tpk.is_identity, 0 ) AS IsPkIdentity
 FROM sys.columns c
     INNER JOIN sys.objects o
         ON o.object_id = c.object_id
     LEFT JOIN sys.types t
         ON t.user_type_id = c.user_type_id
+    LEFT JOIN
+    (
+        SELECT c.name AS column_name,
+               i.name AS index_name,
+               c.is_identity
+        FROM sys.indexes i
+            INNER JOIN sys.index_columns ic
+                ON i.object_id = ic.object_id
+                   AND i.index_id = ic.index_id
+            INNER JOIN sys.columns c
+                ON ic.object_id = c.object_id
+                   AND c.column_id = ic.column_id
+        WHERE i.is_primary_key = 1
+              AND i.object_id = OBJECT_ID(CONCAT(@Schema,'.',@TableName))
+    ) tpk
+        ON UPPER(tpk.column_name) = UPPER(c.name)
 WHERE o.type = 'U'
       AND o.name = @TableName
       AND OBJECT_SCHEMA_NAME(c.object_id) = @Schema;
@@ -123,10 +142,17 @@ BEGIN
 												CHAR(9), '[Computed]',CHAR(13)
 												) 	
 				ELSE	''
-				END
+				END,
+	@Key= CASE WHEN IsPkIdentity = 1 THEN CONCAT(
+													CHAR(9), '[Key]',CHAR(13)
+												) 
+					ELSE '' 
+					END 	                
+	--@Key= IsPkIdentity
 	FROM @TableColumns WHERE RowID = @RowCount
 
 	SELECT @Props = CONCAT(@Props,
+		@Key,
 		@Computed,
 		CHAR(9),'public ',@DataType,' ',UPPER(LEFT(@ColumnName,1))+LOWER(SUBSTRING(@ColumnName,2,LEN(@ColumnName))), ' { get; set; }',CHAR(13)
 	)
@@ -143,7 +169,7 @@ SET @Code = CONCAT(
 '// end of generated code', CHAR(13)
 )
 
-SELECT @Code
+SELECT @Code AS CodeOutput
 PRINT @Code
 
 endBlock:

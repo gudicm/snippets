@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>FindViewsBySchema</Title>
+      <Shortcut>FindViewsBySchema</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[SELECT 
+    SchemaName = s.name,
+    ViewName = v.name 
+FROM 
+    sys.views v
+INNER JOIN 
+    sys.schemas s ON v.schema_id = s.schema_id
+	WHERE s.name = 'DigitalniFormulariHR']]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>ConstraintDisableOnTable</Title>
+      <Shortcut>ConstraintDisableOnTable</Shortcut>
+      <Description>disable/enable constraint on table</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[-- Disable all table constraints
+ALTER TABLE YourTableName NOCHECK CONSTRAINT ALL
+-- Enable all table constraints
+ALTER TABLE YourTableName CHECK CONSTRAINT ALL]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

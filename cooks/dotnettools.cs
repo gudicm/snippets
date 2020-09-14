@@ -6,6 +6,16 @@ dotnet new [template-name] --name [project-name]
 dotnet new console --name MyFirstApp
 dotnet add package [package]
 dotnet restore
+
+dotnet publish -c Release -o published // build and publish release version of project to specific file
+
+// blazor boilerplate
+dotnet new blazorserver -o TodoList
+// from correct path
+dotnet new razorcomponent -n Todo -o Pages
+
+
+  
 // dotnet util
 
 // sc	-- for communication with the Service Control Manager and services 

@@ -1,0 +1,201 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>dapperSpAsync</Title>
+      <Shortcut>dapperSpAsync</Shortcut>
+      <Description>generate c# proc call with dapper ORM</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[    DECLARE @SpName VARCHAR(100),
+            @SchemaName VARCHAR(100);
+    DECLARE @FuncCode VARCHAR(8000),
+            @FuncParams VARCHAR(1000),
+            @ProcParams VARCHAR(3000),
+			@Line VARCHAR(1000),
+			@MsgOut VARCHAR(200),
+			@RetType VARCHAR(50)
+	DECLARE @ParamName VARCHAR(50),
+            @ParamType VARCHAR(50),
+            @ParamAdoType VARCHAR(50),
+			@ParamDir VARCHAR(100),
+            @ParamVar VARCHAR(100),
+			@ParamSize INT;
+
+    DECLARE @RowCount INT,
+            @RowSet INT;
+    DECLARE @tParams TABLE
+    (
+        RowID INT NOT NULL PRIMARY KEY IDENTITY(1, 1),
+        ParamName sysname,
+        ParamVar sysname,
+		AdoDbType sysname,
+        ParamType sysname,
+        ParamSize sysname,
+        Direction sysname,
+        ProcName sysname,
+		SchemaName sysname
+    );
+	DECLARE @IsNoProcFound BIT;
+
+BEGIN
+
+    SELECT @SpName = 'spKnjizenjePoRacunu_Select';
+    SELECT @SchemaName = 'FINIZV';
+    SELECT @RetType = 'List<int>';
+
+
+	IF(NOT  EXISTS(
+		        SELECT 1
+               SPECIFIC_NAME
+        FROM INFORMATION_SCHEMA.ROUTINES
+        WHERE ROUTINE_NAME LIKE CONCAT('%', @SpName)
+              AND SPECIFIC_SCHEMA = @SchemaName
+	))
+	BEGIN
+		SET @IsNoProcFound = 1
+		GOTO ProcNotFound
+	END
+
+	SELECT @SpName =
+    (
+        SELECT TOP 1
+               SPECIFIC_NAME
+        FROM INFORMATION_SCHEMA.ROUTINES
+        WHERE ROUTINE_NAME LIKE CONCAT('%', @SpName)
+              AND SPECIFIC_SCHEMA = @SchemaName
+    );
+
+	INSERT INTO @tParams
+    (
+        ParamName,
+        ParamVar,
+        ParamType,
+		AdoDbType,
+        ParamSize,
+        Direction,
+        ProcName,
+		SchemaName
+    )
+    SELECT sys.parameters.name AS paramName,
+           CONCAT('p', (RIGHT(sys.parameters.name, LEN(sys.parameters.name) - 1))) AS paramVar,
+           sys.types.name AS paramType,
+		   CASE
+			WHEN CAST(sys.types.name AS NVARCHAR(128)) = 'bigint' THEN 'DbType.BigInt'
+			WHEN CAST(sys.types.name AS NVARCHAR(128))= 'binary' THEN 'DbType.VarBinary'
+			WHEN CAST(sys.types.name AS NVARCHAR(128)) = 'bit' THEN 'DbType.Bit'
+			WHEN CAST(sys.types.name AS NVARCHAR(128)) = 'char' THEN 'DbType.Char'
+			WHEN CAST(sys.types.name AS NVARCHAR(128)) = 'datetime' THEN 'DbType.Date'
+			WHEN CAST(sys.types.name AS NVARCHAR(128)) = 'datetime2' THEN 'DbType.DateTime'
+			WHEN CAST(sys.types.name AS NVARCHAR(128)) = 'decimal' THEN 'DbType.Decimal'	
+			WHEN CAST(sys.types.name AS NVARCHAR(128)) = 'float' THEN 'DbType.Float'	
+			WHEN CAST(sys.types.name AS NVARCHAR(128)) = 'int' THEN 'DbType.Int'	
+			WHEN CAST(sys.types.name AS NVARCHAR(128)) = 'money' THEN 'DbType.Money'
+			WHEN CAST(sys.types.name AS NVARCHAR(128)) = 'numeric' THEN 'DbType.Decimal'
+			WHEN CAST(sys.types.name AS NVARCHAR(128)) = 'nvarchar' THEN 'DbType.NVarChar'
+			WHEN CAST(sys.types.name AS NVARCHAR(128)) = 'numeric' THEN 'DbType.Decimal'
+			WHEN CAST(sys.types.name AS NVARCHAR(128)) = 'varchar' THEN 'DbType.VarChar'
+			WHEN CAST(sys.types.name AS NVARCHAR(128)) = 'xml' THEN 'DbType.Xml'
+			ELSE 'Object'												
+		 END AS AdoDbType,
+           sys.parameters.max_length AS ParamSize,
+           CASE 
+				WHEN sys.parameters.is_output = 1 THEN 'ParametarDirection.Output'
+                ELSE 'ParameterDirection.Input' 
+			END AS Direction,
+           sys.procedures.name AS procName,
+		    OBJECT_SCHEMA_NAME(sys.procedures.object_id) AS SchemaName
+    FROM sys.parameters
+        INNER JOIN sys.procedures
+            ON PARAMETERS.object_id = procedures.object_id
+        INNER JOIN sys.types
+            ON PARAMETERS.system_type_id = types.system_type_id
+               AND PARAMETERS.user_type_id = types.user_type_id
+    WHERE procedures.name = @SpName;
+
+	SET @RowSet = @@ROWCOUNT;
+
+	SET @FuncParams = (SELECT	CONCAT(' ', paramtype, ' ' , paramVar,',') FROM @tParams FOR XML PATH(''))
+	
+	--SET @ProcParams = (	SELECT	CONCAT('param.Add(', paramName, ',' , paramVar,')',CHAR(13)) FROM @tParams FOR XML PATH(''))
+	
+	SET	 @FuncParams = LEFT(@FuncParams, LEN(@FuncParams)-1)
+	
+    SELECT *
+    FROM @tParams AS tp;
+	SET @RowSet = @@ROWCOUNT;
+
+	PRINT 'rowset = ' + CAST(@RowSet AS VARCHAR(4))
+
+		 IF (
+		EXISTS(
+			SELECT 1 FROM @tParams
+		))
+	BEGIN
+			SET @RowCount = 1
+
+			SET @ProcParams = CONCAT(
+				CHAR(9),CHAR(9),'var @params = new DynamicParameters();', CHAR(13)
+				)
+
+			WHILE (@RowCount <= @RowSet)
+			BEGIN
+				SELECT @ParamName=ParamName, @ParamVar = ParamVar, 
+				@ParamAdoType = AdoDbType, @ParamDir = Direction, @ParamSize =ParamSize 
+				FROM @tParams WHERE RowID=@RowSet
+				SET @ProcParams = CONCAT(@ProcParams, CHAR(9),CHAR(9), '@params.Add("' ,@ParamName, '", ',@ParamVar,', ',@ParamAdoType,', ',@ParamDir,
+				',',CAST( @ParamSize AS varchar),');',CHAR(13))
+				
+				SET @RowCount = @RowCount +1 
+			END
+			-- await dbConnection.QueryAsync<GroupPosition>(sql: "usp_GetGroupPositions", commandType: CommandType.StoredProcedure);
+			SET @ProcParams = CONCAT(
+			@ProcParams,CHAR(9), CHAR(9),
+			'var res = await conn.QueryAsync<',@RetType,'>(sql: "',@SchemaName,'.',@SpName, '", @params, commandType: CommandType.StoredProcedure);'
+			,CHAR(13),
+			CHAR(9), CHAR(9), 'return res;',CHAR(13)
+			)
+			
+			-- PRINT @ProcParams
+	END
+	
+	SELECT @FuncCode = CONCAT(
+	 '// generated code ', CHAR(13),
+	 'public async Task<',@RetType,'> callProc',@SpName,'(',@FuncParams,')',CHAR(13),
+	 '{',CHAR(13),
+	 CHAR(9), 'using (SqlConnection conn = new SqlConnection(Conn.String))', CHAR(13),
+	 CHAR(9), '{', CHAR(13),
+	 CHAR(9),CHAR(9),'await conn.OpenAsync();',CHAR(13),
+	 @ProcParams,
+
+	 CHAR(9), '}', CHAR(13),
+	 ----@FuncCode,CHAR(13),
+	 '}', CHAR(13),
+	 '// end of generated code '
+	 )	
+
+
+	 SELECT @FuncCode
+	 PRINT @FuncCode
+
+END
+
+ProcNotFound:
+IF @IsNoProcFound = 1
+BEGIN
+	    
+	SET @MsgOut = CONCAT('Procedure ',@SchemaName,'.',@SpName,' not found') 
+	SELECT @MsgOut
+	PRINT @MsgOut
+END
+
+
+  ]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

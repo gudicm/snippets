@@ -30,11 +30,16 @@ ng new {app-name} -ng4
 ng generate component {new component name}	// new component
 //
 
+// Refactor the routing configuration into a routing module
+ng generate module app-routing --module app --flat
 // db json server
 npm install -g json-server
 // run json server json-server --watch <relative-path-to-json-file>
+
 // db json server
 
+// angular-cli.json to angular.json
+ng update @angular/cli --from=1.7.4 --migrate-only
 
 // generate angular client with <ng-swagger-gen>
 npm install ng-swagger-gen --save-dev

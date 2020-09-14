@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>ConstraintDisable</Title>
+      <Shortcut>ConstraintDisable</Shortcut>
+      <Description>disable/enable specific constraint</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[-- Disable single constraint
+ALTER TABLE YourTableName NOCHECK CONSTRAINT YourConstraint
+-- Enable single constraint
+ALTER TABLE YourTableName CHECK CONSTRAINT YourConstraint]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

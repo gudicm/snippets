@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>sp_executesql_Params</Title>
+      <Shortcut>sp_executesql_Params</Shortcut>
+      <Description>tempalte with more paeams</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[EXEC sp_executesql @sqlText, N'@PkUsera INT,@PkDrzave INT', @PkUsera=@PkUsera, @PkDrzave=@PkDrzave]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

@@ -140,7 +140,8 @@
 
 <details><summary>Stateless vs Statefull objects</summary>
 <p>
-    - example of stateless class is static class, only have calculation methods. Statefull object 
+    
+    example of stateless class is static class, only have calculation methods. Statefull object 
     are entity classes or business object  holding a context context  
 
 </p>
@@ -148,6 +149,7 @@
 
 <details><summary>Abstract class</summary>
 <p>
+
     - it is not intended to be instanciated(but it can have constructor and members),
     it needs to have at least single 'abstract' method. 
     it is used for definition of Base class in class hierarchy
@@ -174,15 +176,14 @@
 
 <details><summary>Tuple</summary>
 <p>
-    - used when you want to have oject that represents data structure but you dont want to defined type class or struct for it.
+    
+    used when you want to have oBject that represents data structure but you dont want to defined type class or struct for it.
     e.g.
     Tuple<int, string, string> person =  new Tuple<int, string, string>(1,"Joe", "Doe");
 
     With static helper:
     var person = Tuple.Create(1, "Joe", "Doe");
 
-
-    
       
 </p>
 </details>
@@ -193,7 +194,7 @@
 
 <p>
 
-     - it is fast access memmory, size is defined by OS,
+     - it is fast access memory, size is defined by OS,
      - stores local variables and function variables,
      - variables are declared, initialised and allocated during a runtime,
      - it is linear data structure, and varibles are stored in block, therefore cannot be     fragmented
@@ -608,3 +609,14 @@ print("hello world!")
 
 </p>
 </details>   
+
+- pool pattern,
+- usage of streams,
+- large heap objects( with streams ),
+- put(update) and post(create), 
+- rcp for calculation,
+- Configure.await();
+- CancelationToken, through timespan;
+
+- angular observable merge, 
+- C# reactive programming

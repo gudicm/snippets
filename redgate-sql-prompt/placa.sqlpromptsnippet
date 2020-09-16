@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>placa</Title>
+      <Shortcut>placa</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[SELECT SifraDjelatnika AS 'Šifra djelatnika',
+pkdjelatnik AS 'ID djelatnika',
+NazivRadnogMjesta AS 'Naziv radnog mjesta',
+PrezimeIImeDjelatnika AS 'Ime Prezime',
+SUM(BrojSati) AS 'Mjesečni fond sati',
+SUM(BrutoIznosPlace) AS 'Brutto plaća (Brutto 1)',
+sum(NeoporeziviMaterijalniTrosak)as Neoporezivo_PutniTrosak,
+sum(DoprinosiNaPlacu)as DoprinosiNaPlacu,
+sum(DoprinosNaPlacu)as DoprinosNaPlacu,
+SUM(NetoIznosPlace) AS 'Netto plaća',
+sum (UkupniTrosakPlace)as 'UkupnitrosakPlace (Brutto 2)'
+FROM place.IsplataPlacePoStrukturi
+WHERE godina=2020
+AND mjesec=8
+--AND PkDjelatnik =1627
+and ( 
+PrezimeIImeDjelatnika  LIKE '%GUDIĆ%' OR 
+PrezimeIImeDjelatnika  LIKE '%JERKOVIĆ%' OR 
+PrezimeIImeDjelatnika  LIKE '%KOSANOVIĆ%' OR
+PrezimeIImeDjelatnika  LIKE '%TOMAŠ%' 
+) 
+GROUP BY pkdjelatnik,
+PrezimeIImeDjelatnika,
+SifraDjelatnika,
+NazivRadnogMjesta ;]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

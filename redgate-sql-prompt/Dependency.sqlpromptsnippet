@@ -2,9 +2,9 @@
 <CodeSnippets>
   <CodeSnippet Format="1.0.0">
     <Header>
-      <Title>rownumber</Title>
-      <Shortcut>rownumber</Shortcut>
-      <Description />
+      <Title>Dependency</Title>
+      <Shortcut>Dependency</Shortcut>
+      <Description>get all dependency on object</Description>
       <Author />
       <SnippetTypes>
         <SnippetType>Expansion</SnippetType>
@@ -13,13 +13,12 @@
     <Snippet>
       <Declarations>
         <Literal>
-          <ID>columnName</ID>
+          <ID>object_name</ID>
           <ToolTip />
           <Default />
         </Literal>
       </Declarations>
-      <Code Language="sql"><![CDATA[ROW_NUMBER() OVER(ORDER BY $columnName$ ASC) AS Row#
-]]></Code>
+      <Code Language="sql"><![CDATA[EXEC sys.sp_depends @objname = N'$object_name$']]></Code>
     </Snippet>
   </CodeSnippet>
 </CodeSnippets>

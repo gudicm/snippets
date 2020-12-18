@@ -11,18 +11,7 @@
       </SnippetTypes>
     </Header>
     <Snippet>
-      <Declarations>
-        <Literal>
-          <ID>proc-name</ID>
-          <ToolTip />
-          <Default />
-        </Literal>
-        <Literal>
-          <ID>param-name</ID>
-          <ToolTip />
-          <Default />
-        </Literal>
-      </Declarations>
+      <Declarations />
       <Code Language="sql"><![CDATA[SET QUOTED_IDENTIFIER ON
 GO
 -- =============================================
@@ -30,12 +19,17 @@ GO
 -- Create date: <Create Date,,>
 -- Description:	<Description,,>
 -- =============================================
-CREATE PROCEDURE dbo.$proc-name$ 
+CREATE PROCEDURE dbo.proc-name 
 	-- Add the parameters for the stored procedure here
 (
-	@$param-name$ int
+	@param-name int
 )
 AS
+
+SET NOCOUNT ON;
+SET XACT_ABORT ON;
+
+
 BEGIN
 	SELECT GETDATE()
 

@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>stringFromRecords</Title>
+      <Shortcut>stringFromRecords</Shortcut>
+      <Description>resultset to concatenated string</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[DECLARE @temp TABLE (name NVARCHAR(50))
+
+INSERT INTO @temp (name)
+VALUES ('kim'),('lee'),('park'),('cho')
+
+SELECT STUFF((
+    SELECT ',' + name
+    FROM @temp
+    FOR XML PATH(''), TYPE).value('.', 'NVARCHAR(MAX)'), 1, 1, '')]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

@@ -4,12 +4,12 @@
 <details><summary>Access modifiers</summary>
 <p>
 
-- public    - from same class, other class, same assembly, other assembly or other code
-- protected - from same class or from derived class
-- private   - from same class or struct
-- internal  - from same assembly 
-- protected internal - from the same assebly or from the derived classes
-- private protected - from current class or from derived classes within same assembly
+public    - from same class, other class, same assembly, other assembly or other code
+protected - from same class or from derived class
+private   - from same class or struct
+internal  - from same assembly 
+protected internal - from the same assebly or from the derived classes
+private protected - from current class or from derived classes within same assembly
 
 </p>
 </details>
@@ -30,8 +30,11 @@
 <p>
 
 - IEnumerable
+  _when querying in-memory collection like Array, List_
+  
 - IQueryable 
-
+  _when querying data from out-memory(like remote database, service)_
+  **_check OData specification!!!_** 
 </p>
 </details>
 
@@ -86,8 +89,8 @@
 <details><summary>Interface</summary>
 <p>
 
-    Agrement how components should communicate with each other. By origin hould only contain prototype of method. With C# 8.0 ver. feature of 'default interfaces' is available.
-    Meaning that interface method could have concrete impelementation.
+    Agrement how components should communicate with each other. By origin should only contain prototype of method. With C# 8.0 ver. feature of 'default interfaces' is available.
+    Meaning that interface method could have concrete implementation.
 
 </p>
 </details>
@@ -122,18 +125,21 @@
 
 <details><summary>Reflection</summary>
 <p>
-    - ability to retrieve aplication metadata during application runtime
+    
+    ability to retrieve aplication metadata during application 
+    runtime
+
 </p>
 </details>
 
 <details><summary>'static' keyword</summary>
 <p>
+    
     Static modifier can be applied on the class, field, method. If class is static all members of class needs to be also static. Static class cannot be instanciated.
     
     Static methods can access static and non-static variables, if accessing non-static variables, methods need to be called on instance.
 
     Static variable will be shared among all instances of class. 
-
 
 </p>
 </details>
@@ -142,7 +148,7 @@
 <p>
     
     example of stateless class is static class, only have calculation methods. Statefull object 
-    are entity classes or business object  holding a context context  
+    are entity classes or business object  holding a context  
 
 </p>
 </details>
@@ -150,7 +156,7 @@
 <details><summary>Abstract class</summary>
 <p>
 
-    - it is not intended to be instanciated(but it can have constructor and members),
+    it is not intended to be instanciated (but it can have constructor and members),
     it needs to have at least single 'abstract' method. 
     it is used for definition of Base class in class hierarchy
 
@@ -159,7 +165,8 @@
 
 <details><summary>Sealed modifier</summary>
 <p>
-    - Class declared as Sealed cannot be extended(inherited).
+    
+    Class declared as Sealed cannot be extended(inherited).
     Method declared as Sealed cannot be overriden.
       
 </p>
@@ -167,8 +174,8 @@
 
 <details><summary>Virtual modifier</summary>
 <p>
-    - Virtual can be assign to a method or property, identifing that functionality 
-    can be ovveriden in derived class.
+   
+    Virtual can be assign to a method or property, identifing that functionality can be ovveriden in derived class.
       
 </p>
 </details>
@@ -177,7 +184,8 @@
 <details><summary>Tuple</summary>
 <p>
     
-    used when you want to have oBject that represents data structure but you dont want to defined type class or struct for it.
+    used when you want to have object that represents data structure but you dont want to defined type class or struct for it.
+
     e.g.
     Tuple<int, string, string> person =  new Tuple<int, string, string>(1,"Joe", "Doe");
 
@@ -197,7 +205,7 @@
      - it is fast access memory, size is defined by OS,
      - stores local variables and function variables,
      - variables are declared, initialised and allocated during a runtime,
-     - it is linear data structure, and varibles are stored in block, therefore cannot be     fragmented
+     - it is linear data structure, and varibles are stored in block, therefore cannot be fragmented
      - it is not possible to resize variable
      - CPU or process manages with allocation and deallocation of memory
      - faster, cost less, fixed size but can cause shortage of memory       
@@ -225,6 +233,22 @@
 
     will return IEnumerable object as result , but with yield state machine will be created
     for iteration. 
+
+</p>
+</details>
+
+<details><summary>REST</summary>
+<p>
+
+    Representational state transfer software architecture style defines constraints for Web Services.
+
+</p>
+</details>
+
+<details><summary>ODATA</summary>
+<p>
+
+    Open Data protocol for creation of queryable REST api
 
 </p>
 </details>
@@ -269,6 +293,7 @@
 <p>
 
     - with 'using' declaration directive is given to compiler that declared variable will be automatically dispose when next enclosing type is reached.
+   
     e.g
     using var file = new System.IO.StreamWriter("Sample.txt");
     file.WriteLine("Hello world");    
@@ -323,13 +348,16 @@ Summary from [Garbage collection fundamentals](https://docs.microsoft.com/en-us/
 
 <details><summary> GC conditions </summary>
 <p>
+
     When OS notifies GC about low physical memory or surplus heap threshold, GC calls 
     method 'GC.Collect()' whis releases heap memory base on managed heap criteria.  
+
 </p>
 </details>
 
 <details><summary> GC algorithm </summary>
 <p>
+    
     GC takes in consideration following:
     - it is to compose heap section, rather then whole heap,
     - newly object has a shorter lifespan, that older objects,
@@ -371,7 +399,7 @@ Summary from [Garbage collection fundamentals](https://docs.microsoft.com/en-us/
         object o = i;      
 
     Boxing is expensive to memory performance because reference object is created as copy 
-    of vlue object on managed heap.
+    of value object on managed heap.
 
     Unboxing is reversal process that cast a refernce object to value type, it is also expensive.
     1. it is checked if reference instance is boxed version of value type.
@@ -394,7 +422,8 @@ Check for more on:
 
 <details><summary>abstract class vs interface</summary>
 <p>
-    interface only can be used to define functionality, but abstract class can create(implement) functionality to be implemented or override by subclass. Class can extend only one abstract class
+   
+    interface only can be used to define functionality, but abstract class can create (implement) functionality to be implemented or override by subclass. Class can extend only one abstract class
     but can implement several interfaces. 
 
 
@@ -403,20 +432,18 @@ Check for more on:
 
 <details><summary>difference Array vs  ArrayList vs List?</summary>
 <p>
+    
     Array is static and continuos in memory, is method of organizing data in memory
-    List is dynamic and random , it is data structure that allows several operation 
-    on collection type(add, insert, remove,...) 
-    ArrayList is alternative to Array, but it is NOT strongly typed and can accept any element,
-    also can accept NULL values.
-
+    List is dynamic and random , it is data structure that allows several operation on collection type(add, insert, remove,...) 
+    ArrayList is alternative to Array, but it is NOT strongly typed and can accept any element, also can accept NULL values.
 
 </p>
 </details>
 
 <details><summary>break s continue</summary>
 <p>
-    'Break' will interupt a loop and exit from the loop, while 'Continue' will only 
-    break current iteration and will continue with next iteration.
+    
+    'Break' will interupt a loop and exit from the loop, while 'Continue' will only break current iteration and will continue with next iteration.
 
 
 </p>
@@ -449,9 +476,7 @@ Check for more on:
 <details><summary>explain encapsulation?</summary>
 <p>
 
-    It is grouping code into logical packages, purpose is to reduces coupling beetwen software
-    componets and to encourage code reusability. It is done using 'access modifiers'(specifiers).
-
+    It is grouping code into logical packages, purpose is to reduces coupling beetwen software  components and to encourage code reusability. It is done using 'access modifiers'(specifiers).
 
 </p>
 </details>
@@ -460,8 +485,7 @@ Check for more on:
 <p>
 
     struct is for a record type. if all record members are value types and object is short-lived  than it makes a sense.
-    to define object as struct. Such instance will be allocated and deallocated on stack,
-    in difference to class instance.
+    to define object as struct. Such instance will be allocated and deallocated on stack, in difference to class instance.
 
 
 </p>
@@ -585,7 +609,7 @@ Check for more on:
 <details><summary>System.Object and its methods</summary>
 <p>
 
-    Base type for .NET classes, importan methods are:
+    Base type for .NET classes, important methods are:
     - ToString();
     - Equals(),
     - Finalize(),

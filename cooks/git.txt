@@ -64,6 +64,10 @@ git clone https://gudicm:Gudmar974278@github.com/gudicm/eTommy.git
 git clone https://gudicm:Gudici470101@github.com/gudicm/eTommy.git
 git clone https://gudicm:Gudmar974278@github.com/gudicm/eTommy.git
 git clone https://gudicm:Gudmar974278@github.com/gudicm/GitTest.git
+git clone https://gudicm:Gudici470101@github.com/gudicm/Shopping-Card.git
+
+
+https://github.com/gudicm/Shopping-Card.git
 
 
 https://github.com/gudicm/AspNet.Core.Api.Tutorial.git

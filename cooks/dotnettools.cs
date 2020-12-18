@@ -46,3 +46,8 @@ Scaffold-DbContext "Server=IT-27105\SQLEXPRESS;Database=BookStoreCodeMaze;Truste
 Scaffold-DbContext -force "Server=IT-27105\SQLEXPRESS;Database=BookStoreCodeMaze;Trusted_Connection=True;" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models
 // schema
 Scaffold-DbContext "Server=IT-27105\SQLEXPRESS;Database=AdventureWorks2016CTP3;Trusted_Connection=True;" Microsoft.EntityFrameworkCore.SqlServer -Schemas HumanResources -OutputDir Models
+// table
+Scaffold-DbContext "Server=IT-27105\SQLEXPRESS;Database=AdventureWorks2016CTP3;Trusted_Connection=True;" Microsoft.EntityFrameworkCore.SqlServer -Schemas HumanResources -OutputDir Models --table Artist
+
+
+Scaffold-DbContext "Data Source=PromisDev;Initial Catalog=PromisDevelop;Integrated Security=True" Microsoft.EntityFrameworkCore.SqlServer -Schemas  -OutputDir Entities -tables Drzava

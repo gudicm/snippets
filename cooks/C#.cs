@@ -64,38 +64,7 @@ public object GetGenericPerson(int id, string first, string last, string addr,in
 // procedure ->new ADO -> 
 // ENTITY FRAMEWORK
 
-/// LOG4NET
-/// tutorial "https://stackify.com/log4net-guide-dotnet-logging/"
-/// log4net.config example
-
-<?xml version="1.0" encoding="utf-8" ?>
-<configuration>
-  <log4net>
-    <root>
-      <level value="ALL" />
-      <appender-ref ref="console" />
-      <appender-ref ref="file" />
-    </root>
-    <appender name="console" type="log4net.Appender.ConsoleAppender">
-      <layout type="log4net.Layout.PatternLayout">
-        <conversionPattern value="%date %level %logger - %message%newline" />
-      </layout>
-    </appender>
-    <appender name="file" type="log4net.Appender.RollingFileAppender">
-      <file value="myapp.log" />
-      <appendToFile value="true" />
-      <rollingStyle value="Size" />
-      <maxSizeRollBackups value="5" />
-      <maximumFileSize value="10MB" />
-      <staticLogFileName value="true" />
-      <layout type="log4net.Layout.PatternLayout">
-        <conversionPattern value="%date [%thread] %level %logger - %message%newline" />
-      </layout>
-    </appender>
-  </log4net>
-</configuration>
-/// log4net levels(All – Log everything, Debug, Info, Warn, Error, Fatal,Off – Don’t log anything)
- 
+//Logger 
 
 /// LOG4NET
 ///GUI

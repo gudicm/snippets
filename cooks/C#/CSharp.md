@@ -413,6 +413,8 @@ Summary from [Garbage collection fundamentals](https://docs.microsoft.com/en-us/
 </p>
 </details>
 
+**
+
 **QUESTIONS?**
 ======
 
@@ -616,8 +618,32 @@ Check for more on:
     - GetType(),
     - GetHashCode()
 
+
 </p>
 </details>
+
+**SOLID PRINCIPLES**
+======
+[medium article](https://medium.com/@mirzafarrukh13/
+solid-design-principles-c-de157c500425)
+
+<details><summary> SRP(Single Responsibility Principle) </summary>
+<p>
+
+    One class should be responsible for one task. if we need to perform another task write a another class for it.
+     
+</p>
+</details>
+<details><summary> OCP(Open Closed principle) </summary>
+<p>
+
+We should strive to write a code that should not be changed every time the requirement is changed. 
+Way to accoplish it is you base class for common definition.
+     
+</p>
+</details>
+
+
 
  ## collapsible markdown?
 

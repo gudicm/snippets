@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>merge</Title>
+      <Shortcut>merge</Shortcut>
+      <Description>merge example</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[--MERGE target_table USING source_table
+--ON merge_condition
+--WHEN MATCHED
+--    THEN update_statement
+--WHEN NOT MATCHED
+--    THEN insert_statement
+--WHEN NOT MATCHED BY SOURCE
+--    THEN DELETE;
+
+MERGE sales.category t 
+    USING sales.category_staging s
+ON (s.category_id = t.category_id)
+WHEN MATCHED
+    THEN UPDATE SET 
+        t.category_name = s.category_name,
+        t.amount = s.amount
+WHEN NOT MATCHED BY TARGET 
+    THEN INSERT (category_id, category_name, amount)
+         VALUES (s.category_id, s.category_name, s.amount)
+WHEN NOT MATCHED BY SOURCE 
+    THEN DELETE;]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

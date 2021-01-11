@@ -11,7 +11,13 @@
       </SnippetTypes>
     </Header>
     <Snippet>
-      <Declarations />
+      <Declarations>
+        <Literal>
+          <ID>tableName</ID>
+          <ToolTip />
+          <Default />
+        </Literal>
+      </Declarations>
       <Code Language="sql"><![CDATA[declare @tableName varchar(200)
 declare @columnName varchar(200)
 declare @nullable varchar(50)
@@ -24,7 +30,7 @@ declare @sProperty varchar(200)
 DECLARE table_cursor CURSOR FOR 
 SELECT TABLE_NAME
 FROM [INFORMATION_SCHEMA].[TABLES]
-where table_name like '%Cases%'
+where table_name like '%$tableName$%'
 
 OPEN table_cursor
 

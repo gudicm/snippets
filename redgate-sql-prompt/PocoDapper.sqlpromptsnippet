@@ -11,7 +11,23 @@
       </SnippetTypes>
     </Header>
     <Snippet>
-      <Declarations />
+      <Declarations>
+        <Literal>
+          <ID>tableName</ID>
+          <ToolTip />
+          <Default />
+        </Literal>
+        <Literal>
+          <ID>schemaName</ID>
+          <ToolTip />
+          <Default />
+        </Literal>
+        <Literal>
+          <ID>ClassName</ID>
+          <ToolTip />
+          <Default />
+        </Literal>
+      </Declarations>
       <Code Language="sql"><![CDATA[DECLARE @TableName VARCHAR(50), @Schema VARCHAR(20), @Entity VARCHAR(20)
 DECLARE @Code VARCHAR(8000), @Props VARCHAR(2000);
 DECLARE @ColumnName VARCHAR(50), @DataType VARCHAR(50), @Key VARCHAR(50), @Computed VARCHAR(500)
@@ -36,9 +52,9 @@ IsPkIdentity BIT
 
 BEGIN
 
-SET @TableName =  $<table_name>$ 
-SET @Schema = $<_schema_name>$
-SET @Entity = $<class_name>$
+SET @TableName = '$tableName$' 
+SET @Schema = '$schemaName$'
+SET @Entity = '$ClassName$'
 
 -- format input values
 SELECT @Entity = UPPER(LEFT(@Entity,1))+LOWER(SUBSTRING(@Entity,2,LEN(@Entity))),
@@ -85,6 +101,7 @@ SELECT CAST(OBJECT_SCHEMA_NAME(c.object_id) AS NVARCHAR(128)) SchemaName,
 			WHEN CAST(t.name AS NVARCHAR(128)) = 'numeric' THEN 'decimal'
 			WHEN CAST(t.name AS NVARCHAR(128)) = 'varchar' THEN 'string'
 			WHEN CAST(t.name AS NVARCHAR(128)) = 'xml' THEN 'Xml'
+			WHEN CAST(t.name AS NVARCHAR(128)) = 'timestamp' THEN 'byte[]'
 			ELSE 'Object'																																	
 	   END  AS SqlDataType,
 	   t.max_length AS Length_Size,
@@ -119,9 +136,10 @@ WHERE o.type = 'U'
       AND OBJECT_SCHEMA_NAME(c.object_id) = @Schema;
 
 
-SET @RowSet = @@ROWCOUNT
 
 SELECT * FROM @TableColumns
+
+SET @RowSet = @@ROWCOUNT
 
 IF(@RowSet = 0)
 BEGIN
@@ -165,6 +183,7 @@ SET @Code = CONCAT(
 'public class ',@Entity, CHAR(13),
 '{',CHAR(13),
 @Props,
+CHAR(13),
 '}',CHAR(13),
 '// end of generated code', CHAR(13)
 )

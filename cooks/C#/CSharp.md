@@ -8,7 +8,7 @@ public    - from same class, other class, same assembly, other assembly or other
 protected - from same class or from derived class
 private   - from same class or struct
 internal  - from same assembly 
-protected internal - from the same assebly or from the derived classes
+protected internal - from the same assembly or from the derived classes
 private protected - from current class or from derived classes within same assembly
 
 </p>
@@ -175,7 +175,9 @@ private protected - from current class or from derived classes within same assem
 <details><summary>Virtual modifier</summary>
 <p>
    
-    Virtual can be assign to a method or property, identifing that functionality can be ovveriden in derived class.
+    Virtual can be assign to a method or property, identifing that functionality can be ovveriden in derived class. With virtual keyword signal is given to compiler that during runtime ovveriden implementzation of member is to be called
+    with most derived member.
+
       
 </p>
 </details>
@@ -253,6 +255,22 @@ private protected - from current class or from derived classes within same assem
 </p>
 </details>
 
+<details><summary>Code complexity</summary>
+<p>
+
+    is a metric for delivered code complecity.With available tools(CodeMaid, Resharper) complexity is calculated with 
+    Cyclomatic method.
+    Method is described wih formula:
+    M = E- N + 2P
+
+    Where:
+    E - number of edges in control flow
+    N - number of connected nodes in control flow
+    P - number of nodes with exit 
+
+</p>
+
+</details>
 
 **DESIGN PATTERNS**
 ======

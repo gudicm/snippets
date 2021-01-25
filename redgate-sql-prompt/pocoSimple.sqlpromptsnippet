@@ -11,87 +11,249 @@
       </SnippetTypes>
     </Header>
     <Snippet>
-      <Declarations />
-      <Code Language="sql"><![CDATA[declare @tableName varchar(200)
-declare @columnName varchar(200)
-declare @nullable varchar(50),@nullOperator VARCHAR(3)
-declare @datatype varchar(50)
-declare @maxlen int
+      <Declarations>
+        <Literal>
+          <ID>tableName</ID>
+          <ToolTip />
+          <Default />
+        </Literal>
+        <Literal>
+          <ID>dbo</ID>
+          <ToolTip />
+          <Default />
+        </Literal>
+        <Literal>
+          <ID>ClassName</ID>
+          <ToolTip />
+          <Default />
+        </Literal>
+      </Declarations>
+      <Code Language="sql"><![CDATA[DECLARE @TableName VARCHAR(50),
+        @Schema VARCHAR(20),
+        @Entity VARCHAR(20);
+DECLARE @Code VARCHAR(8000),
+        @Props VARCHAR(2000);
+DECLARE @ColumnName VARCHAR(50),
+        @DataType VARCHAR(50),
+        @Key VARCHAR(50),
+        @Computed VARCHAR(500),
+        @MaxLength VARCHAR(50),
+        @Required VARCHAR(20);
+DECLARE @RowCount INT,
+        @RowSet INT;
+DECLARE @ToEnd BIT = 0;
+DECLARE @TableColumns TABLE
+(
+    RowID INT NOT NULL PRIMARY KEY IDENTITY(1, 1),
+    SchemaName VARCHAR(128),
+    Table_Name VARCHAR(128),
+    Field_Name VARCHAR(128),
+    Id_Object INT NOT NULL,
+    Column_Id INT NOT NULL,
+    Data_Type VARCHAR(128),
+    SqlDataType VARCHAR(128),
+    Length_Size INT NOT NULL,
+    Precision INT,
+    IsNullable BIT,
+    IsComputed BIT,
+    IsIdentity BIT,
+    IsPkIdentity BIT
+);
 
-declare @sType varchar(50)
-declare @sProperty varchar(200)
-
-DECLARE table_cursor CURSOR FOR 
-SELECT TABLE_NAME
-FROM [INFORMATION_SCHEMA].[TABLES]
-where table_name like '%Users%'
-
-OPEN table_cursor
-
-FETCH NEXT FROM table_cursor 
-INTO @tableName
-
-WHILE @@FETCH_STATUS = 0
 BEGIN
 
-PRINT 'public class ' + @tableName + ' {'
+    SET @TableName = '$tableName$';
+    SET @Schema = '$dbo$';
+    SET @Entity = '$ClassName$';
 
-    DECLARE column_cursor CURSOR FOR 
-    SELECT COLUMN_NAME, IS_NULLABLE, DATA_TYPE, ISNULL(CHARACTER_MAXIMUM_LENGTH,'-1') 
-  FROM [INFORMATION_SCHEMA].[COLUMNS] 
-	WHERE [TABLE_NAME] = @tableName
-	ORDER BY [ORDINAL_POSITION]
+    -- format input values
+    SELECT @Entity = UPPER(LEFT(@Entity, 1)) + LOWER(SUBSTRING(@Entity, 2, LEN(@Entity))),
+           @TableName = UPPER(LEFT(@TableName, 1)) + LOWER(SUBSTRING(@TableName, 2, LEN(@TableName)));
 
-    OPEN column_cursor
-    FETCH NEXT FROM column_cursor INTO @columnName, @nullable, @datatype, @maxlen
 
-    WHILE @@FETCH_STATUS = 0
+
+    INSERT INTO @TableColumns
+    (
+        SchemaName,
+        Table_Name,
+        Field_Name,
+        Id_Object,
+        Column_Id,
+        Data_Type,
+        SqlDataType,
+        Length_Size,
+        Precision,
+        IsNullable,
+        IsComputed,
+        IsIdentity,
+        IsPkIdentity
+    )
+    SELECT CAST(OBJECT_SCHEMA_NAME(c.object_id) AS NVARCHAR(128)) SchemaName,
+           CAST(o.name AS NVARCHAR(128)) AS Table_Name,
+           CAST(c.name AS NVARCHAR(128)) AS Field_Name,
+           o.object_id AS Id_Object,
+           c.column_id AS Column_Id,
+           CAST(t.name AS NVARCHAR(128)) AS Data_Type,
+           CASE
+               WHEN CAST(t.name AS NVARCHAR(128)) = 'bigint' THEN
+                   'Int64'
+               WHEN CAST(t.name AS NVARCHAR(128)) = 'binary' THEN
+                   'Binary'
+               WHEN CAST(t.name AS NVARCHAR(128)) = 'bit' THEN
+                   'Boolean'
+               WHEN CAST(t.name AS NVARCHAR(128)) = 'nchar' THEN
+                   'string'
+               WHEN CAST(t.name AS NVARCHAR(128)) = 'char' THEN
+                   'char'
+               WHEN CAST(t.name AS NVARCHAR(128)) = 'datetime' THEN
+                   'DateTime'
+               WHEN CAST(t.name AS NVARCHAR(128)) = 'datetime2' THEN
+                   'DateTime'
+               WHEN CAST(t.name AS NVARCHAR(128)) = 'decimal' THEN
+                   'decimal'
+               WHEN CAST(t.name AS NVARCHAR(128)) = 'float' THEN
+                   'double'
+               WHEN CAST(t.name AS NVARCHAR(128)) = 'int' THEN
+                   'int'
+               WHEN CAST(t.name AS NVARCHAR(128)) = 'money' THEN
+                   'decimal'
+               WHEN CAST(t.name AS NVARCHAR(128)) = 'numeric' THEN
+                   'decimal'
+               WHEN CAST(t.name AS NVARCHAR(128)) = 'nvarchar' THEN
+                   'string'
+               WHEN CAST(t.name AS NVARCHAR(128)) = 'numeric' THEN
+                   'decimal'
+               WHEN CAST(t.name AS NVARCHAR(128)) = 'varchar' THEN
+                   'string'
+               WHEN CAST(t.name AS NVARCHAR(128)) = 'xml' THEN
+                   'Xml'
+               WHEN CAST(t.name AS NVARCHAR(128)) = 'timestamp' THEN
+                   'byte[]'
+               ELSE
+                   'Object'
+           END AS SqlDataType,
+           c.max_length AS Length_Size,
+           t.precision AS Precision,
+           c.is_nullable AS IsNullable,
+           c.is_computed AS IsComputed,
+           c.is_identity AS IsIdentity,
+           ISNULL(tpk.is_identity, 0) AS IsPkIdentity
+    FROM sys.columns c
+        INNER JOIN sys.objects o
+            ON o.object_id = c.object_id
+        LEFT JOIN sys.types t
+            ON t.user_type_id = c.user_type_id
+        LEFT JOIN
+        (
+            SELECT c.name AS column_name,
+                   i.name AS index_name,
+                   c.is_identity
+            FROM sys.indexes i
+                INNER JOIN sys.index_columns ic
+                    ON i.object_id = ic.object_id
+                       AND i.index_id = ic.index_id
+                INNER JOIN sys.columns c
+                    ON ic.object_id = c.object_id
+                       AND c.column_id = ic.column_id
+            WHERE i.is_primary_key = 1
+                  AND i.object_id = OBJECT_ID(CONCAT(@Schema, '.', @TableName))
+        ) tpk
+            ON UPPER(tpk.column_name) = UPPER(c.name)
+    WHERE o.type = 'U'
+          AND o.name = @TableName
+          AND OBJECT_SCHEMA_NAME(c.object_id) = @Schema;
+
+
+
+    SELECT *
+    FROM @TableColumns;
+
+    SET @RowSet = @@ROWCOUNT;
+
+    IF (@RowSet = 0)
+    BEGIN
+        SET @ToEnd = 1;
+        GOTO endBlock;
+
+    END;
+
+    SET @RowCount = 1;
+    WHILE (@RowCount <= @RowSet)
     BEGIN
 
-	-- datatype
-	SELECT @sType = CASE @datatype
-	WHEN 'int' THEN 'int'
-	WHEN 'decimal' THEN 'decimal'
-	WHEN 'money' THEN 'decimal'
-	WHEN 'char' THEN 'string'
-	WHEN 'nchar' THEN 'string'
-	WHEN 'varchar' THEN 'string'
-	WHEN 'nvarchar' THEN 'string'
-	WHEN 'uniqueidentifier' THEN 'Guid'
-	WHEN 'datetime' THEN 'DateTime'
-	WHEN 'bit' THEN 'bool'
-	ELSE 'string'
-	END
+        SELECT @ColumnName = Field_Name,
+               @DataType = SqlDataType,
+               @Required = CASE
+                               WHEN IsNullable = 1 THEN
+                                   CONCAT('[Required]', CHAR(13))
+                               ELSE
+                                   ''
+                           END,
+               @MaxLength = CASE
+                                WHEN Data_Type = 'varchar' THEN
+                                    CONCAT(CHAR(9), '[MaxLength(', Length_Size, ')]', CHAR(13))
+                                ELSE
+                                    ''
+                            END,
+               @Computed = CASE
+                               WHEN IsComputed = 1 THEN
+                                   CONCAT(CHAR(9), '[Write(false)]', CHAR(13), CHAR(9), '[Computed]', CHAR(13))
+                               ELSE
+                                   ''
+                           END,
+               @Key = CASE
+                          WHEN IsPkIdentity = 1 THEN
+                              CONCAT(CHAR(9), '[Key]', CHAR(13))
+                          ELSE
+                              ''
+                      END
+        --@Key= IsPkIdentity
+        FROM @TableColumns
+        WHERE RowID = @RowCount;
 
-		IF (@nullable = 'NO')
-        BEGIN
-            PRINT '[Required]';
-            SET @nullOperator = '';
-        END;
+        SELECT @Props
+            = CONCAT(
+                        @Props,
+                        @Required,
+                        @MaxLength,
+                        --@Key,
+                        --@Computed,
+                        CHAR(9),
+                        'public ',
+                        @DataType,
+                        ' ',
+                        UPPER(LEFT(@ColumnName, 1)) + LOWER(SUBSTRING(@ColumnName, 2, LEN(@ColumnName))),
+                        ' { get; set; }',
+                        CHAR(13)
+                    );
+        SET @RowCount = @RowCount + 1;
+    END;
 
+    SET @Code
+        = CONCAT(
+                    '// generated code',
+                    CHAR(13),
+                    --'[Table("',UPPER(@Schema),'.',@TableName,'")]', CHAR(13),
+                    'public class ',
+                    @Entity,
+                    CHAR(13),
+                    '{',
+                    CHAR(13),
+                    @Props,
+                    CHAR(13),
+                    '}',
+                    CHAR(13),
+                    '// end of generated code',
+                    CHAR(13)
+                );
 
-        IF (@sType = 'String' AND @maxlen <> '-1')
-        BEGIN
-            PRINT '[MaxLength(' + CONVERT(VARCHAR(4), @maxlen) + ')]';
-            SET @nullOperator = '?';
-        END;
+    SELECT @Code AS CodeOutput;
+    PRINT @Code;
 
-        SELECT @sProperty = 'public ' + @sType + @nullOperator + ' ' + UPPER(LEFT(@columnName,1))+LOWER(SUBSTRING(@columnName,2,LEN(@columnName))) + ' { get; set;}';
-        PRINT @sProperty
-
-		PRINT ''
-		FETCH NEXT FROM column_cursor INTO @columnName, @nullable, @datatype, @maxlen
-	END
-    CLOSE column_cursor
-    DEALLOCATE column_cursor
-
-	PRINT '}'
-	PRINT ''
-    FETCH NEXT FROM table_cursor 
-    INTO @tableName
-END
-CLOSE table_cursor
-DEALLOCATE table_cursor]]></Code>
+    endBlock:
+    IF (@ToEnd = 1)
+        SELECT 'Table with name ' + @Schema + '.' + @TableName ' not found';
+END;]]></Code>
     </Snippet>
   </CodeSnippet>
 </CodeSnippets>

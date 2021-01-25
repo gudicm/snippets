@@ -13,12 +13,12 @@
     <Snippet>
       <Declarations>
         <Literal>
-          <ID>test</ID>
+          <ID>spPrebacivanjeURuPromis</ID>
           <ToolTip />
           <Default />
         </Literal>
         <Literal>
-          <ID>dbo</ID>
+          <ID>FINIZV</ID>
           <ToolTip />
           <Default />
         </Literal>
@@ -29,7 +29,7 @@
             @SchemaName VARCHAR(100),
             @ReturnType VARCHAR(100);
     DECLARE @CCode VARCHAR(8000),
-            @Codepart VARCHAR(4000),
+            @Codepart VARCHAR(7000),
             @vProcCall VARCHAR(500);
     DECLARE @ParamName VARCHAR(50),
             @ParamType VARCHAR(50),
@@ -46,24 +46,20 @@
         ParamType sysname,
         ParamSize sysname,
         isOut sysname,
-        ProcName sysname
+        ProcName sysname,
+		SchemaName sysname
     );
 
 
-    SET @SpName = '$test$';
-    SET @SchemaName = '$dbo$';
-    SET @ReturnType = '$IEnumerable<DateTime>$';
+    SET @SpName = '$spPrebacivanjeURuPromis$';
+    SET @SchemaName = '$FINIZV$';
+    SET @ReturnType = '$IEnumerable<PracRacun>$';
     SELECT @Codepart = '';
 
 
 
 
-    --SELECT @SpName = (
-    --SELECT TOP 1 SPECIFIC_NAME FROM INFORMATION_SCHEMA.ROUTINES 
-    --WHERE 
-    --ROUTINE_NAME like CONCAT('%',@SpName)
-    --AND SPECIFIC_SCHEMA = @SchemaName
-    --)
+    
 
 
     INSERT INTO @tParams
@@ -73,21 +69,28 @@
         ParamType,
         ParamSize,
         isOut,
-        ProcName
+        ProcName,
+		SchemaName
     )
     SELECT sys.parameters.name AS paramName,
            CONCAT('p', (RIGHT(sys.parameters.name, LEN(sys.parameters.name) - 1))) AS paramVar,
            sys.types.name AS paramType,
            sys.parameters.max_length AS ParamSize,
            sys.parameters.is_output AS isOut,
-           sys.procedures.name AS procName
+           sys.procedures.name AS procName,
+           sys.schemas.name AS schemaName
     FROM sys.parameters
         INNER JOIN sys.procedures
             ON PARAMETERS.object_id = procedures.object_id
+        INNER JOIN sys.schemas
+            ON sys.schemas.schema_id = procedures.schema_id
         INNER JOIN sys.types
             ON PARAMETERS.system_type_id = types.system_type_id
                AND PARAMETERS.user_type_id = types.user_type_id
-    WHERE procedures.name = @SpName;
+    WHERE procedures.name = @SpName
+          AND sys.schemas.name = @SchemaName;
+
+
 
     SET @RowSet = @@ROWCOUNT;
 
